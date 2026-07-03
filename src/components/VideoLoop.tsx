@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 /**
@@ -9,9 +10,11 @@ import { useEffect, useRef, useState } from "react";
  */
 export function VideoLoop({
   src,
+  poster,
   className,
 }: {
   src: string;
+  poster?: string;
   className?: string;
 }) {
   const aRef = useRef<HTMLVideoElement>(null);
@@ -58,9 +61,20 @@ export function VideoLoop({
   }, []);
 
   return (
-    <div className={className}>
+    <div className={`bg-ink ${className ?? ""}`}>
+      {poster && (
+        <Image
+          src={poster}
+          alt=""
+          aria-hidden
+          fill
+          priority
+          className="object-cover"
+        />
+      )}
       <video
         ref={aRef}
+        poster={poster}
         className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[900ms] ease-out"
         style={{ opacity: aOnTop ? 1 : 0 }}
         autoPlay
@@ -72,6 +86,7 @@ export function VideoLoop({
       </video>
       <video
         ref={bRef}
+        poster={poster}
         className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[900ms] ease-out"
         style={{ opacity: aOnTop ? 0 : 1 }}
         muted

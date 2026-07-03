@@ -81,7 +81,11 @@ function HeroSection() {
   return (
     <>
       <div className="fixed inset-0 z-0 h-screen w-full">
-        <VideoLoop src="/videos/hero.mp4" className="relative h-full w-full" />
+        <VideoLoop
+          src="/videos/hero.mp4"
+          poster="/images/hero.png"
+          className="relative h-full w-full"
+        />
       </div>
 
       <section className="relative z-10 flex min-h-screen flex-col justify-center bg-transparent pb-16">
