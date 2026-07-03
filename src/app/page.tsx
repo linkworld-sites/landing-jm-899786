@@ -2,13 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   AnimatePresence,
   useScroll,
   useTransform,
   useReducedMotion,
+  useInView,
+  useSpring,
+  useMotionValue,
+  useVelocity,
+  useAnimationFrame,
 } from "framer-motion";
 import { track } from "@/lib/funnel";
 import ConversionForm from "@/components/ConversionForm";
@@ -100,10 +105,18 @@ const ATELIER_IMAGES = [
   { src: "/images/detail.png", caption: "Kurz vor der Fertigstellung." },
 ];
 
+const DROP_STRIP_IMAGES = ["/images/detail.png", "/images/material.png", "/images/process.png"];
+
 // ── Motion helpers ────────────────────────────────────────────────────────────
 
 const easeOut: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const easeEditorial: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const easeHeadline: [number, number, number, number] = [0.76, 0, 0.24, 1];
+
+function wrap(min: number, max: number, v: number) {
+  const rangeSize = max - min;
+  return ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min;
+}
 
 function FadeUp({
   children,
@@ -145,11 +158,11 @@ function LineReveal({
       {lines.map((line, i) => (
         <div key={i} className="overflow-hidden">
           <motion.div
-            initial={reduced ? {} : { y: "110%" }}
+            initial={reduced ? {} : { y: "100%" }}
             whileInView={reduced ? {} : { y: 0 }}
             transition={{
-              duration: 1.1,
-              ease: easeEditorial,
+              duration: 0.9,
+              ease: easeHeadline,
               delay: baseDelay + i * 0.12,
             }}
             viewport={{ once: true, amount: 0.1 }}
@@ -166,8 +179,25 @@ function LineReveal({
 // ── Hero ──────────────────────────────────────────────────────────────────────
 
 function HeroSection() {
+  const { scrollY } = useScroll();
+  const reduced = useReducedMotion();
+  const scale = useTransform(scrollY, [0, 200], reduced ? [1, 1] : [1.06, 1]);
+
   return (
-    <section className="relative z-10 min-h-screen flex flex-col justify-end pb-20 md:pb-32 bg-transparent">
+    <section className="relative z-10 min-h-screen flex flex-col justify-end pb-20 md:pb-32 overflow-hidden bg-ink">
+      {/* Single large-format photograph — the jacket, not a video */}
+      <motion.div style={{ scale }} className="absolute inset-0 z-0">
+        <Image
+          src="/images/hero.png"
+          alt="Handbemalte Jeansjacke, flach auf Leinen im Streiflicht"
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-ink/30" />
+      </motion.div>
+
       {/* Gradient fade hero → linen */}
       <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-b from-transparent to-linen pointer-events-none z-10" />
 
@@ -192,24 +222,45 @@ function ManifestoStrip() {
   const reduced = useReducedMotion();
   const sentence =
     "Ich male nicht auf Stoff. Ich male auf das, was jemand trägt.";
-  const chunk = `${sentence}   ·   ${sentence}   ·   ${sentence}   ·   ${sentence}   ·   `;
+
+  // Scroll-velocity-driven marquee: fast scrolling accelerates the text,
+  // stopping lets it decelerate and rest — the one "active" motion moment.
+  const baseX = useMotionValue(0);
+  const { scrollY } = useScroll();
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(scrollVelocity, { damping: 50, stiffness: 400 });
+  const velocityFactor = useTransform(smoothVelocity, [0, 1000], [0, 5], {
+    clamp: false,
+  });
+  const x = useTransform(baseX, (v) => `${wrap(-25, -50, v)}%`);
+  const directionFactor = useRef(1);
+
+  useAnimationFrame((_t, delta) => {
+    if (reduced) return;
+    let moveBy = directionFactor.current * 2.5 * (delta / 1000);
+    if (velocityFactor.get() < 0) directionFactor.current = -1;
+    else if (velocityFactor.get() > 0) directionFactor.current = 1;
+    moveBy += directionFactor.current * moveBy * velocityFactor.get();
+    baseX.set(baseX.get() + moveBy);
+  });
 
   return (
     <section className="relative z-10 bg-ink overflow-hidden py-10">
-      <div
-        className={`inline-block whitespace-nowrap ${reduced ? "" : "animate-jm-marquee"}`}
+      <motion.div
+        style={{ x: reduced ? "0%" : x }}
+        className="inline-flex whitespace-nowrap"
         aria-label={sentence}
       >
-        <span className="font-heading font-semibold italic text-linen/90 text-[clamp(1.1rem,2.5vw,1.875rem)] tracking-wide">
-          {chunk}
-        </span>
-        <span
-          className="font-heading font-semibold italic text-linen/90 text-[clamp(1.1rem,2.5vw,1.875rem)] tracking-wide"
-          aria-hidden
-        >
-          {chunk}
-        </span>
-      </div>
+        {[0, 1, 2, 3].map((i) => (
+          <span
+            key={i}
+            className="font-heading font-semibold italic text-linen/90 text-[clamp(1.1rem,2.5vw,1.875rem)] tracking-wide pr-8"
+            aria-hidden={i > 0}
+          >
+            {sentence}
+          </span>
+        ))}
+      </motion.div>
     </section>
   );
 }
@@ -325,7 +376,7 @@ function WorksSection() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.1, ease: easeOut, delay: i * 0.18 }}
-              viewport={{ once: true, amount: 0.12 }}
+              viewport={{ once: true, amount: 0.15 }}
               className={`group cursor-zoom-in ${
                 work.size === "anchor"
                   ? "w-full md:w-[57%]"
@@ -334,6 +385,7 @@ function WorksSection() {
               onClick={() => setSelected(work)}
             >
               <motion.div
+                layoutId={`work-image-${work.id}`}
                 whileHover={{ scale: 1.018 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 className={`relative overflow-hidden ${
@@ -383,7 +435,7 @@ function WorksSection() {
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* Lightbox — shared layoutId morph from thumbnail to full view */}
       <AnimatePresence>
         {selected && (
           <motion.div
@@ -394,15 +446,15 @@ function WorksSection() {
             className="fixed inset-0 z-50 bg-ink/92 flex items-center justify-center p-6 cursor-zoom-out"
             onClick={() => setSelected(null)}
           >
-            <motion.div
-              className="relative max-w-2xl w-full overflow-hidden cursor-default"
+            <div
+              className="relative max-w-2xl w-full cursor-default"
               onClick={(e) => e.stopPropagation()}
-              initial={{ scale: 0.92, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.92, opacity: 0 }}
-              transition={{ duration: 0.45, ease: easeEditorial }}
             >
-              <div className="relative aspect-[4/5]">
+              <motion.div
+                layoutId={`work-image-${selected.id}`}
+                transition={{ duration: 0.55, ease: easeEditorial }}
+                className="relative aspect-[4/5] overflow-hidden"
+              >
                 <Image
                   src={selected.image}
                   alt={selected.title}
@@ -410,8 +462,14 @@ function WorksSection() {
                   className="object-contain"
                   sizes="(max-width: 1024px) 90vw, 800px"
                 />
-              </div>
-              <div className="mt-4 flex justify-between items-baseline">
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
+                className="mt-4 flex justify-between items-baseline"
+              >
                 <div>
                   <h3 className="font-heading font-medium text-lg text-linen">
                     {selected.title}
@@ -423,7 +481,7 @@ function WorksSection() {
                 <span className="text-xs font-body text-linen/60 uppercase tracking-[0.15em]">
                   {selected.status}
                 </span>
-              </div>
+              </motion.div>
               <button
                 onClick={() => setSelected(null)}
                 className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-linen/60 hover:text-linen text-xl leading-none"
@@ -431,11 +489,36 @@ function WorksSection() {
               >
                 ×
               </button>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
     </section>
+  );
+}
+
+// ── Commission numerals ───────────────────────────────────────────────────────
+
+function AnimatedNumeral({ value, className }: { value: number; className?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.6 });
+  const reduced = useReducedMotion();
+  const spring = useSpring(0, { stiffness: 40, damping: 20 });
+  const display = useTransform(spring, (v) =>
+    String(Math.min(value, Math.max(0, Math.round(v)))).padStart(2, "0")
+  );
+
+  useEffect(() => {
+    if (inView) spring.set(value);
+  }, [inView, spring, value]);
+
+  if (reduced) {
+    return <span className={className}>{String(value).padStart(2, "0")}</span>;
+  }
+  return (
+    <motion.span ref={ref} className={className}>
+      {display}
+    </motion.span>
   );
 }
 
@@ -476,9 +559,10 @@ function CommissionSection() {
               {COMMISSION_STEPS.map((step, i) => (
                 <FadeUp key={step.num} delay={0.08 * (i + 1)}>
                   <div className="flex gap-5 items-start">
-                    <span className="font-heading font-bold text-sienna text-[2.25rem] leading-none flex-shrink-0 w-14">
-                      {step.num}
-                    </span>
+                    <AnimatedNumeral
+                      value={i + 1}
+                      className="font-heading font-bold text-sienna text-[2.25rem] leading-none flex-shrink-0 w-14"
+                    />
                     <div className="pt-1">
                       <h3 className="font-heading font-semibold text-ink text-base mb-1.5">
                         {step.title}
@@ -596,26 +680,28 @@ function QuotesSection() {
   );
 }
 
-// ── CTA ───────────────────────────────────────────────────────────────────────
+// ── CTA / Drop Announcement ───────────────────────────────────────────────────
 
 function CTASection() {
+  const stripImages = [...DROP_STRIP_IMAGES, ...DROP_STRIP_IMAGES];
+
   return (
-    <section className="relative z-10 min-h-[75vh] flex flex-col items-center justify-center overflow-hidden bg-ink">
-      {/* Own background video */}
-      <video
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-35"
-        autoPlay
-        muted
-        loop
-        playsInline
-      >
-        <source src="/videos/hero.mp4" type="video/mp4" />
-      </video>
+    <section className="relative z-10 min-h-[75vh] flex flex-col items-center justify-center overflow-hidden bg-denim">
+      {/* Horizontal strip of photographed drop-piece details */}
+      <div className="absolute inset-0 z-0 opacity-30">
+        <div className="flex h-full w-max animate-jm-strip">
+          {stripImages.map((src, i) => (
+            <div key={i} className="relative h-full w-[45vw] md:w-[28vw] flex-shrink-0">
+              <Image src={src} alt="" fill className="object-cover" sizes="45vw" />
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Gradient top */}
-      <div className="absolute inset-x-0 top-0 h-[200px] bg-gradient-to-b from-ink to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-[200px] bg-gradient-to-b from-denim to-transparent z-10 pointer-events-none" />
       {/* Gradient bottom */}
-      <div className="absolute inset-x-0 bottom-0 h-[200px] bg-gradient-to-t from-ink to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-[200px] bg-gradient-to-t from-denim to-transparent z-10 pointer-events-none" />
 
       <div className="relative z-20 text-center px-6 max-w-3xl w-full">
         <LineReveal
@@ -661,17 +747,6 @@ function CTASection() {
 export default function Home() {
   return (
     <>
-      {/* Fixed background video — z-0; hero section is transparent above it */}
-      <video
-        className="fixed inset-0 w-full h-screen object-cover z-0"
-        autoPlay
-        muted
-        loop
-        playsInline
-      >
-        <source src="/videos/hero.mp4" type="video/mp4" />
-      </video>
-
       <HeroSection />
       <ManifestoStrip />
       <ProcessSection />
