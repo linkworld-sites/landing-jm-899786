@@ -9,3 +9,11 @@ output/
 .DS_Store
 *.log
 .mcp.json
+
+input/
+output/
+CLAUDE.md
+.mcp.json
+__design
+__files
+__mentioned

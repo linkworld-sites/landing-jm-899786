@@ -643,9 +643,9 @@ function CTASection() {
             <motion.a
               href="#commission"
               onClick={() => track("intent")}
-              whileHover={{ backgroundColor: "rgba(242,201,76,0.92)", color: "#4A3728" }}
+              whileHover={{ backgroundColor: "rgba(200,68,10,0.92)" }}
               whileTap={{ scale: 0.97 }}
-              className="inline-flex items-center justify-center px-8 py-3.5 font-body text-xs uppercase tracking-[0.18em] text-ink bg-gold rounded-full cursor-pointer transition-colors duration-300"
+              className="inline-flex items-center justify-center px-8 py-3.5 font-body text-xs uppercase tracking-[0.18em] text-linen bg-sienna rounded-full cursor-pointer transition-colors duration-300"
             >
               Anfrage stellen
             </motion.a>

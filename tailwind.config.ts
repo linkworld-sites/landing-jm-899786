@@ -5,11 +5,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        linen: "#E8E0D0",
-        ink: "#4A3728",
-        sienna: "#C94A2B",
-        navy: "#1B3A5C",
-        gold: "#F2C94C",
+        linen: "#F5F0E8",
+        ink: "#1A1612",
+        sienna: "#C8440A",
+        denim: "#3B5068",
         surface: "#EDE8DC",
       },
       fontFamily: {
