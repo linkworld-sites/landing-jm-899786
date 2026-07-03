@@ -43,9 +43,9 @@ export function Nav() {
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">
           {[
-            { href: "/#arbeiten", label: "Arbeiten" },
-            { href: "/#commission", label: "Auftragsarbeit" },
-            { href: "/#atelier", label: "Atelier" },
+            { href: "/#showcase", label: "Prozess" },
+            { href: "/#atelier", label: "Werdegang" },
+            { href: "/shop", label: "Shop" },
             { href: "/blog", label: "Journal" },
           ].map((link) => (
             <Link
@@ -107,11 +107,10 @@ export function Nav() {
           >
             <nav className="flex flex-col gap-0 px-6 py-6">
               {[
-                { href: "/#arbeiten", label: "Arbeiten" },
-                { href: "/#commission", label: "Auftragsarbeit" },
-                { href: "/#atelier", label: "Atelier" },
-                { href: "/blog", label: "Journal" },
+                { href: "/#showcase", label: "Prozess" },
+                { href: "/#atelier", label: "Werdegang" },
                 { href: "/shop", label: "Shop" },
+                { href: "/blog", label: "Journal" },
               ].map((link) => (
                 <Link
                   key={link.href}

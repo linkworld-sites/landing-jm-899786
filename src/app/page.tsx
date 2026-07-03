@@ -1,55 +1,42 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
-  AnimatePresence,
-  useScroll,
-  useTransform,
+  useInView,
   useReducedMotion,
 } from "framer-motion";
-import { track } from "@/lib/funnel";
 import ConversionForm from "@/components/ConversionForm";
+import { VideoLoop } from "@/components/VideoLoop";
+import { FadeUp, LineReveal, WordStagger, EASE_OUT } from "@/components/motion";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ── Data ──────────────────────────────────────────────────────────────────────
 
-type Work = {
-  id: string;
-  title: string;
-  material: string;
-  status: "Verkauft" | "Verfügbar";
-  image: string;
-  size: "anchor" | "companion";
-};
-
-// ── Static data ───────────────────────────────────────────────────────────────
-
-const WORKS: Work[] = [
+const SHOWCASE = [
   {
-    id: "w1",
-    title: "Abendhimmel",
-    material: "Denim, Acryl, Öl",
-    status: "Verkauft",
     image: "/images/hero.png",
-    size: "anchor",
+    label: "01 — Die Grundierung",
+    title: "Jede Jacke beginnt als Leinwand.",
+    body: "Rohes Denim, grundiert von Hand — bevor ein einziger Pinselstrich fällt.",
   },
   {
-    id: "w2",
-    title: "Wildwuchs",
-    material: "Denim, Acryl",
-    status: "Verfügbar",
+    image: "/images/process.png",
+    label: "02 — Der Auftrag",
+    title: "Schicht für Schicht, Woche für Woche.",
+    body: "Acryl und Öl auf Stoff. Kein Druck, keine Schablone — nur die Hand, die führt.",
+  },
+  {
     image: "/images/detail.png",
-    size: "companion",
+    label: "03 — Das Detail",
+    title: "Aus der Nähe erzählt es mehr.",
+    body: "Brüche, Übergänge, kleine Unregelmäßigkeiten — der Beweis, dass ein Mensch es gemalt hat.",
   },
   {
-    id: "w3",
-    title: "Roherde",
-    material: "Denim, Öl",
-    status: "Verkauft",
     image: "/images/material.png",
-    size: "companion",
+    label: "04 — Die Signatur",
+    title: "Signiert. Datiert. Einmalig.",
+    body: "Kein zweites Stück trägt dieselbe Geschichte. Jede Jacke ist die einzige ihrer Art.",
   },
 ];
 
@@ -58,446 +45,380 @@ const QUOTES = [
     id: "q1",
     text: "Ich habe es zum ersten Mal getragen und jeder wollte wissen, wer das gemacht hat.",
     author: "K.M., Wien",
+    piece: "Auftragsarbeit, 2025",
   },
   {
     id: "q2",
     text: "Kein Kleidungsstück, das ich besitze, erzählt so viel wie dieses.",
     author: "L.T., Graz",
+    piece: "Einzelstück „Wildwuchs“",
   },
   {
     id: "q3",
     text: "Man spürt, dass jemand wirklich nachgedacht hat — über mich, über meine Geschichte.",
     author: "S.V., Wien",
+    piece: "Auftragsarbeit, 2024",
   },
 ];
 
-const COMMISSION_STEPS = [
-  {
-    num: "01",
-    title: "Kontakt",
-    body: "Du schreibst mir — über eine Idee, eine Erinnerung, eine Person. Nicht über Maße oder Farben.",
-  },
-  {
-    num: "02",
-    title: "Gespräch",
-    body: "Wir sprechen. Ich will verstehen, was das Stück tragen soll, bevor ich den ersten Strich setze.",
-  },
-  {
-    num: "03",
-    title: "Entstehung",
-    body: "Das Malen dauert Wochen. Ich schicke dir Zwischenschritte — du siehst, wie deine Geschichte Gestalt annimmt.",
-  },
-  {
-    num: "04",
-    title: "Übergabe",
-    body: "Das Stück kommt zu dir. Ein Original, gefertigt im Atelier Wien. Signiert und datiert.",
-  },
+const STATS = [
+  { value: 40, suffix: "+", label: "Stunden pro Jacke" },
+  { value: 1, suffix: "/1", label: "Jedes Stück ein Original" },
+  { value: 6, suffix: "", label: "Aufträge pro Quartal" },
+  { value: 0, suffix: "", label: "Jemals wiederholt" },
 ];
 
-const ATELIER_IMAGES = [
-  { src: "/images/process.png", caption: "Pinsel auf Denim — der erste Strich." },
-  { src: "/images/material.png", caption: "Pigmente, Paletten, Stille." },
-  { src: "/images/detail.png", caption: "Kurz vor der Fertigstellung." },
+const TIMELINE = [
+  { period: "2019", role: "Erste handbemalte Jacke — verkauft an eine Fremde am Flohmarkt", place: "Wien" },
+  { period: "2021", role: "Warteliste eröffnet sich, erste Auftragsarbeiten entstehen", place: "Atelier Wien" },
+  { period: "2023", role: "Das hundertste Unikat wird übergeben", place: "Wien" },
+  { period: "2025", role: "Das Atelier widmet sich ausschließlich Auftragsarbeiten", place: "Wien" },
 ];
-
-// ── Motion helpers ────────────────────────────────────────────────────────────
-
-const easeOut: [number, number, number, number] = [0.22, 1, 0.36, 1];
-const easeEditorial: [number, number, number, number] = [0.16, 1, 0.3, 1];
-
-function FadeUp({
-  children,
-  delay = 0,
-  className,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
-  const reduced = useReducedMotion();
-  return (
-    <motion.div
-      initial={reduced ? {} : { opacity: 0, y: 24 }}
-      whileInView={reduced ? {} : { opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: easeOut, delay }}
-      viewport={{ once: true, amount: 0.2 }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-function LineReveal({
-  lines,
-  className,
-  lineClassName,
-  baseDelay = 0,
-}: {
-  lines: string[];
-  className?: string;
-  lineClassName?: string;
-  baseDelay?: number;
-}) {
-  const reduced = useReducedMotion();
-  return (
-    <div className={className}>
-      {lines.map((line, i) => (
-        <div key={i} className="overflow-hidden">
-          <motion.div
-            initial={reduced ? {} : { y: "110%" }}
-            whileInView={reduced ? {} : { y: 0 }}
-            transition={{
-              duration: 1.1,
-              ease: easeEditorial,
-              delay: baseDelay + i * 0.12,
-            }}
-            viewport={{ once: true, amount: 0.1 }}
-            className={lineClassName}
-          >
-            {line}
-          </motion.div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 // ── Hero ──────────────────────────────────────────────────────────────────────
 
 function HeroSection() {
   return (
-    <section className="relative z-10 min-h-screen flex flex-col justify-end pb-20 md:pb-32 bg-transparent">
-      {/* Gradient fade hero → linen */}
-      <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-b from-transparent to-linen pointer-events-none z-10" />
-
-      <div className="relative z-20 px-6 md:px-12 lg:px-20 max-w-5xl">
-        <LineReveal
-          lines={["Kein Stück", "wie das andere."]}
-          lineClassName="font-heading font-bold text-white leading-[0.88] tracking-[-0.02em] text-[clamp(3.5rem,9.5vw,8rem)]"
-        />
-        <FadeUp delay={0.55} className="mt-6 max-w-sm">
-          <p className="text-white/75 text-base md:text-lg font-body leading-relaxed">
-            Handbemalte Jeansjacken-Unikate aus Wien.
-          </p>
-        </FadeUp>
+    <>
+      <div className="fixed inset-0 z-0 h-screen w-full">
+        <VideoLoop src="/videos/hero.mp4" className="relative h-full w-full" />
       </div>
-    </section>
+
+      <section className="relative z-10 flex min-h-screen flex-col justify-center bg-transparent pb-16">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-48 bg-gradient-to-b from-transparent to-linen" />
+        <div className="relative z-20 max-w-[720px] px-6 md:px-12 lg:px-20">
+          <WordStagger
+            text="Kein Stück wie das andere."
+            className="font-heading font-bold text-white leading-[0.95] tracking-[-0.02em] text-[clamp(2.75rem,7.5vw,6rem)]"
+          />
+          <FadeUp delay={0.9} className="mt-6 max-w-sm">
+            <p className="font-body text-base leading-relaxed text-white/75 md:text-lg">
+              Jede Jacke ein Unikat — handbemalte Denim-Einzelstücke aus dem
+              Atelier Wien.
+            </p>
+          </FadeUp>
+          <FadeUp delay={1.1} className="mt-10">
+            <motion.a
+              href="#showcase"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="glass-btn inline-flex items-center gap-2 rounded-full px-6 py-3 font-body text-xs uppercase tracking-[0.18em] text-white"
+            >
+              Der Prozess ↓
+            </motion.a>
+          </FadeUp>
+        </div>
+      </section>
+    </>
   );
 }
 
-// ── Manifesto ─────────────────────────────────────────────────────────────────
+// ── Sticky Product Showcase (features) ───────────────────────────────────────
 
-function ManifestoStrip() {
-  const reduced = useReducedMotion();
-  const sentence =
-    "Ich male nicht auf Stoff. Ich male auf das, was jemand trägt.";
-  const chunk = `${sentence}   ·   ${sentence}   ·   ${sentence}   ·   ${sentence}   ·   `;
-
-  return (
-    <section className="relative z-10 bg-ink overflow-hidden py-10">
-      <div
-        className={`inline-block whitespace-nowrap ${reduced ? "" : "animate-jm-marquee"}`}
-        aria-label={sentence}
-      >
-        <span className="font-heading font-semibold italic text-linen/90 text-[clamp(1.1rem,2.5vw,1.875rem)] tracking-wide">
-          {chunk}
-        </span>
-        <span
-          className="font-heading font-semibold italic text-linen/90 text-[clamp(1.1rem,2.5vw,1.875rem)] tracking-wide"
-          aria-hidden
-        >
-          {chunk}
-        </span>
-      </div>
-    </section>
-  );
-}
-
-// ── Process ───────────────────────────────────────────────────────────────────
-
-function ProcessSection() {
+function ShowcaseCaption({
+  index,
+  active,
+  setActive,
+  item,
+}: {
+  index: number;
+  active: number;
+  setActive: (i: number) => void;
+  item: (typeof SHOWCASE)[number];
+}) {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const reduced = useReducedMotion();
-  const y = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [reduced ? "0px" : "0px", reduced ? "0px" : "-60px"]
-  );
+  const inView = useInView(ref, { margin: "-45% 0% -45% 0%" });
+
+  useEffect(() => {
+    if (inView) setActive(index);
+  }, [inView, index, setActive]);
 
   return (
-    <section
-      id="arbeiten"
-      ref={ref}
-      className="relative z-10 bg-linen py-24 md:py-44 overflow-hidden"
-    >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20">
-        <div className="grid md:grid-cols-5 gap-12 md:gap-0 items-start">
-          {/* Left 60% — image with parallax */}
-          <motion.div
-            style={{ y }}
-            className="md:col-span-3 relative aspect-[3/4] overflow-hidden"
-          >
-            <Image
-              src="/images/process.png"
-              alt="Atelier — der Malprozess auf Denim"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 60vw"
-              priority
-            />
-          </motion.div>
-
-          {/* Right 40% — text offset down */}
-          <div className="md:col-span-2 md:pt-[28%] md:pl-12 lg:pl-20">
-            <FadeUp>
-              <span className="text-[11px] font-body uppercase tracking-[0.22em] text-sienna block mb-6">
-                Der Prozess
-              </span>
-            </FadeUp>
-            <FadeUp delay={0.1}>
-              <h2 className="font-heading font-bold text-ink leading-[1.05] text-[clamp(1.75rem,3.5vw,2.75rem)] mb-8">
-                Langsame Arbeit.<br />Bleibendes Ergebnis.
-              </h2>
-            </FadeUp>
-            <FadeUp delay={0.2}>
-              <p className="font-body text-ink/65 text-base leading-[1.8] mb-5">
-                Jede Jacke beginnt mit einem Gespräch. Ich male keine Muster —
-                ich male Bedeutung. Der Stoff wird grundiert, dann Schicht für
-                Schicht aufgebaut wie auf einer Leinwand.
-              </p>
-            </FadeUp>
-            <FadeUp delay={0.3}>
-              <p className="font-body text-ink/65 text-base leading-[1.8] mb-5">
-                Acryl und Öl auf Denim — das Ergebnis ist waschbar, haltbar und
-                mit der Zeit immer schöner. Jede Jacke trägt die Spur der Hand,
-                die sie gemalt hat.
-              </p>
-            </FadeUp>
-            <FadeUp delay={0.4}>
-              <p className="font-body text-ink/45 text-sm italic">
-                Gefertigt und bemalt im Atelier, Wien.
-              </p>
-            </FadeUp>
-          </div>
-        </div>
-      </div>
-    </section>
+    <div ref={ref} className="flex min-h-[50vh] flex-col justify-center md:min-h-[60vh]">
+      <FadeUp>
+        <span className="mb-4 block text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+          {item.label}
+        </span>
+        <h3 className="mb-4 font-heading font-bold text-ink leading-[1.05] text-[clamp(1.6rem,3.2vw,2.5rem)]">
+          {item.title}
+        </h3>
+        <p className="max-w-sm font-body text-base leading-[1.8] text-ink/60">
+          {item.body}
+        </p>
+      </FadeUp>
+    </div>
   );
 }
 
-// ── Works grid ────────────────────────────────────────────────────────────────
-
-function WorksSection() {
-  const [selected, setSelected] = useState<Work | null>(null);
+function ShowcaseSection() {
+  const [active, setActive] = useState(0);
 
   return (
-    <section className="relative z-10 bg-linen pb-24 md:pb-44">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20">
-        <FadeUp>
-          <div className="flex items-baseline justify-between mb-14 md:mb-20">
-            <div>
-              <span className="text-[11px] font-body uppercase tracking-[0.22em] text-sienna block mb-2">
-                Einzelstücke
-              </span>
-              <h2 className="font-heading font-bold text-ink text-[clamp(2rem,5vw,3.5rem)] leading-[1.0]">
-                Die Arbeiten
-              </h2>
-            </div>
-            <Link
-              href="/shop"
-              className="hidden md:block text-xs font-body uppercase tracking-[0.18em] text-ink/50 hover:text-sienna transition-colors"
-            >
-              Alle ansehen →
-            </Link>
-          </div>
-        </FadeUp>
-
-        {/* Variable editorial grid */}
-        <div className="flex flex-wrap items-start gap-6 md:gap-10">
-          {WORKS.map((work, i) => (
-            <motion.article
-              key={work.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.1, ease: easeOut, delay: i * 0.18 }}
-              viewport={{ once: true, amount: 0.12 }}
-              className={`group cursor-zoom-in ${
-                work.size === "anchor"
-                  ? "w-full md:w-[57%]"
-                  : "w-full sm:w-[calc(50%-0.75rem)] md:w-[37%]"
-              }`}
-              onClick={() => setSelected(work)}
-            >
-              <motion.div
-                whileHover={{ scale: 1.018 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className={`relative overflow-hidden ${
-                  work.size === "anchor" ? "aspect-[4/5]" : "aspect-[3/4]"
-                }`}
-              >
-                <Image
-                  src={work.image}
-                  alt={work.title}
-                  fill
-                  className="object-cover transition-[filter] duration-500 group-hover:brightness-[1.04]"
-                  sizes={
-                    work.size === "anchor"
-                      ? "(max-width: 768px) 100vw, 60vw"
-                      : "(max-width: 640px) 100vw, (max-width: 768px) 50vw, 35vw"
-                  }
-                />
-              </motion.div>
-              <div className="mt-4 flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="font-heading font-medium text-base md:text-lg text-ink group-hover:text-sienna transition-colors duration-300">
-                    {work.title}
-                  </h3>
-                  <p className="text-xs font-body text-ink/45 mt-1 tracking-wide">
-                    {work.material}
-                  </p>
-                </div>
-                <span
-                  className={`text-[10px] font-body uppercase tracking-[0.18em] mt-1 flex-shrink-0 ${
-                    work.status === "Verfügbar" ? "text-sienna" : "text-ink/35"
-                  }`}
+    <section id="showcase" className="relative z-10 bg-linen py-24 md:py-0">
+      <div className="mx-auto max-w-7xl px-6 md:px-12 lg:px-20">
+        <div className="md:grid md:grid-cols-2 md:gap-16 lg:gap-24">
+          {/* Pinned visual — desktop only */}
+          <div className="hidden md:sticky md:top-0 md:flex md:h-screen md:items-center">
+            <div className="relative aspect-[4/5] w-full max-h-[70vh] overflow-hidden rounded-sm">
+              {SHOWCASE.map((item, i) => (
+                <motion.div
+                  key={item.image}
+                  className="absolute inset-0"
+                  initial={false}
+                  animate={{ opacity: active === i ? 1 : 0, scale: active === i ? 1 : 1.03 }}
+                  transition={{ duration: 0.7, ease: EASE_OUT }}
                 >
-                  {work.status}
-                </span>
-              </div>
-            </motion.article>
-          ))}
-        </div>
-
-        <div className="mt-10 md:hidden">
-          <Link
-            href="/shop"
-            className="text-xs font-body uppercase tracking-[0.18em] text-ink/50 hover:text-sienna transition-colors"
-          >
-            Alle ansehen →
-          </Link>
-        </div>
-      </div>
-
-      {/* Lightbox */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35 }}
-            className="fixed inset-0 z-50 bg-ink/92 flex items-center justify-center p-6 cursor-zoom-out"
-            onClick={() => setSelected(null)}
-          >
-            <motion.div
-              className="relative max-w-2xl w-full overflow-hidden cursor-default"
-              onClick={(e) => e.stopPropagation()}
-              initial={{ scale: 0.92, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.92, opacity: 0 }}
-              transition={{ duration: 0.45, ease: easeEditorial }}
-            >
-              <div className="relative aspect-[4/5]">
-                <Image
-                  src={selected.image}
-                  alt={selected.title}
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 1024px) 90vw, 800px"
-                />
-              </div>
-              <div className="mt-4 flex justify-between items-baseline">
-                <div>
-                  <h3 className="font-heading font-medium text-lg text-linen">
-                    {selected.title}
-                  </h3>
-                  <p className="text-xs font-body text-linen/50 mt-1">
-                    {selected.material}
-                  </p>
-                </div>
-                <span className="text-xs font-body text-linen/60 uppercase tracking-[0.15em]">
-                  {selected.status}
-                </span>
-              </div>
-              <button
-                onClick={() => setSelected(null)}
-                className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-linen/60 hover:text-linen text-xl leading-none"
-                aria-label="Schließen"
-              >
-                ×
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </section>
-  );
-}
-
-// ── Commission ────────────────────────────────────────────────────────────────
-
-function CommissionSection() {
-  return (
-    <section id="commission" className="relative z-10 bg-surface py-24 md:py-44">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20">
-        <div className="grid md:grid-cols-5 gap-12 md:gap-0 items-start">
-          {/* Left image ~40% */}
-          <div className="md:col-span-2">
-            <FadeUp>
-              <div className="relative aspect-[2/3] overflow-hidden">
-                <Image
-                  src="/images/material.png"
-                  alt="Auftragsarbeit — Atelier Wien"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 40vw"
-                />
-              </div>
-            </FadeUp>
-          </div>
-
-          {/* Right: steps + form */}
-          <div className="md:col-span-3 md:pl-16 lg:pl-24">
-            <FadeUp>
-              <span className="text-[11px] font-body uppercase tracking-[0.22em] text-sienna block mb-6">
-                Auftragsarbeit
-              </span>
-              <h2 className="font-heading font-bold text-ink leading-[1.05] text-[clamp(2rem,4vw,3.25rem)] mb-12">
-                Deine Geschichte.<br />Dein Stück.
-              </h2>
-            </FadeUp>
-
-            <div className="space-y-8 mb-16">
-              {COMMISSION_STEPS.map((step, i) => (
-                <FadeUp key={step.num} delay={0.08 * (i + 1)}>
-                  <div className="flex gap-5 items-start">
-                    <span className="font-heading font-bold text-sienna text-[2.25rem] leading-none flex-shrink-0 w-14">
-                      {step.num}
-                    </span>
-                    <div className="pt-1">
-                      <h3 className="font-heading font-semibold text-ink text-base mb-1.5">
-                        {step.title}
-                      </h3>
-                      <p className="font-body text-ink/60 text-sm leading-[1.8]">
-                        {step.body}
-                      </p>
-                    </div>
-                  </div>
-                </FadeUp>
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 45vw"
+                    priority={i === 0}
+                  />
+                </motion.div>
               ))}
             </div>
+          </div>
 
-            <FadeUp delay={0.45}>
-              <div className="border-t border-ink/12 pt-10">
-                <p className="font-body text-ink/50 text-sm mb-8">
-                  Anfragen werden einzeln bearbeitet — nur eine begrenzte Anzahl
-                  Aufträge pro Quartal.
-                </p>
+          {/* Captions — normal flow, drives the pin length exactly */}
+          <div className="flex flex-col gap-10 md:py-24">
+            {SHOWCASE.map((item, i) => (
+              <ShowcaseCaption key={item.image} index={i} active={active} setActive={setActive} item={item} />
+            ))}
+          </div>
+
+          {/* Mobile — simple stacked image + caption pairs, no pin */}
+          <div className="mt-2 flex flex-col gap-14 md:hidden">
+            {SHOWCASE.map((item) => (
+              <FadeUp key={`m-${item.image}`}>
+                <div className="relative mb-6 aspect-[4/5] w-full overflow-hidden rounded-sm">
+                  <Image src={item.image} alt={item.title} fill className="object-cover" sizes="100vw" />
+                </div>
+                <span className="mb-3 block text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+                  {item.label}
+                </span>
+                <h3 className="mb-3 font-heading font-bold text-ink leading-[1.05] text-[clamp(1.5rem,5vw,2rem)]">
+                  {item.title}
+                </h3>
+                <p className="font-body text-base leading-[1.8] text-ink/60">{item.body}</p>
+              </FadeUp>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Stacked Review Cards (social_proof) ──────────────────────────────────────
+
+function ReviewCard({
+  quote,
+  index,
+  accent,
+}: {
+  quote: (typeof QUOTES)[number];
+  index: number;
+  accent: boolean;
+}) {
+  const startRotate = [-3, 1, 4][index] ?? 0;
+  const reduced = useReducedMotion();
+  return (
+    <motion.blockquote
+      initial={reduced ? {} : { rotate: startRotate, y: 36, opacity: 0 }}
+      whileInView={reduced ? {} : { rotate: 0, y: 0, opacity: 1 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ type: "spring", stiffness: 260, damping: 22, delay: index * 0.1 }}
+      className={`relative flex w-full flex-col justify-between rounded-sm p-8 shadow-[0_20px_50px_-20px_rgba(74,55,40,0.25)] md:w-1/3 md:min-h-[300px] ${
+        index > 0 ? "md:-ml-6" : ""
+      } ${accent ? "bg-sienna text-white" : "bg-linen text-ink"}`}
+      style={{ zIndex: 10 + index }}
+    >
+      <p className={`font-heading font-medium italic leading-[1.35] text-[clamp(1.05rem,2vw,1.35rem)] ${accent ? "text-white" : "text-ink"}`}>
+        &ldquo;{quote.text}&rdquo;
+      </p>
+      <div className="mt-8 flex items-center gap-3">
+        <span
+          className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full font-heading text-xs font-bold ${
+            accent ? "bg-white/20 text-white" : "bg-ink/10 text-ink"
+          }`}
+        >
+          {quote.author.slice(0, 1)}
+        </span>
+        <div>
+          <cite className={`block text-xs font-body not-italic uppercase tracking-[0.15em] ${accent ? "text-white/80" : "text-ink/60"}`}>
+            {quote.author}
+          </cite>
+          <span className={`text-[11px] font-body ${accent ? "text-white/55" : "text-ink/40"}`}>{quote.piece}</span>
+        </div>
+      </div>
+    </motion.blockquote>
+  );
+}
+
+function SocialProofSection() {
+  return (
+    <section className="relative z-10 overflow-hidden bg-surface py-24 md:py-44">
+      <div className="mx-auto max-w-6xl px-6 md:px-12 lg:px-20">
+        <FadeUp className="mb-16 max-w-lg md:mb-24">
+          <span className="mb-2 block text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+            Stimmen
+          </span>
+          <h2 className="font-heading font-bold text-ink leading-[1.0] text-[clamp(2rem,5vw,3.25rem)]">
+            Getragen. Erzählt.
+          </h2>
+        </FadeUp>
+        <div className="flex flex-col items-center gap-8 md:flex-row md:items-stretch md:gap-0">
+          {QUOTES.map((q, i) => (
+            <ReviewCard key={q.id} quote={q} index={i} accent={i === 1} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Numbers Band (stats) ─────────────────────────────────────────────────────
+
+function CountUpStat({ value, suffix, label }: { value: number; suffix: string; label: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.8 });
+  const reduced = useReducedMotion();
+  const [display, setDisplay] = useState(reduced ? value : 0);
+
+  useEffect(() => {
+    if (reduced) {
+      setDisplay(value);
+      return;
+    }
+    if (!inView) return;
+    let start: number | null = null;
+    const duration = 1200;
+    let raf = 0;
+    const step = (ts: number) => {
+      if (start === null) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      setDisplay(Math.round(progress * value));
+      if (progress < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, reduced, value]);
+
+  return (
+    <div ref={ref}>
+      <div className="font-heading font-bold tabular-nums leading-none text-linen text-[clamp(2.5rem,6vw,4rem)]">
+        {display}
+        {suffix}
+      </div>
+      <p className="mt-3 text-[11px] font-body uppercase tracking-[0.22em] text-linen/50">{label}</p>
+    </div>
+  );
+}
+
+function NumbersBand() {
+  return (
+    <section className="relative z-10 bg-ink py-20 md:py-28">
+      <div className="mx-auto max-w-7xl px-6 md:px-12 lg:px-20">
+        <FadeUp className="mb-14 max-w-xl md:mb-20">
+          <p className="font-body text-sm leading-relaxed text-linen/50 md:text-base">
+            Kein Fließband, keine Serie — nur Zeit, Farbe und ein Stück Stoff.
+          </p>
+        </FadeUp>
+        <div className="flex flex-col sm:flex-row">
+          {STATS.map((s, i) => (
+            <div
+              key={s.label}
+              className={`flex-1 py-8 sm:px-8 sm:py-0 ${
+                i > 0 ? "border-t border-linen/15 sm:border-l sm:border-t-0" : ""
+              }`}
+            >
+              <CountUpStat value={s.value} suffix={s.suffix} label={s.label} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Compact Timeline Rows (story) ────────────────────────────────────────────
+
+function TimelineSection() {
+  return (
+    <section id="atelier" className="relative z-10 bg-linen py-24 md:py-44">
+      <div className="mx-auto max-w-7xl px-6 md:px-12 lg:px-20">
+        <div className="grid gap-14 md:grid-cols-5 md:gap-0">
+          <div className="md:col-span-2">
+            <FadeUp>
+              <span className="mb-2 block text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+                Werdegang
+              </span>
+              <h2 className="mb-6 font-heading font-bold text-ink leading-[1.0] text-[clamp(2rem,4.5vw,3rem)]">
+                Wien, seit 2019.
+              </h2>
+              <p className="max-w-sm font-body text-base leading-[1.8] text-ink/60">
+                Angefangen hat es mit einer einzigen Jacke und keinem Plan.
+                Heute ist daraus ein Atelier geworden, das sich ausschließlich
+                Auftragsarbeiten widmet — langsam, ehrlich, von Hand.
+              </p>
+            </FadeUp>
+          </div>
+
+          <div className="md:col-span-3 md:pl-16 lg:pl-24">
+            <div className="flex flex-col gap-6 border-t border-ink/10 pt-8">
+              {TIMELINE.map((row, i) => (
+                <motion.div
+                  key={row.period}
+                  className="grid grid-cols-[auto_auto_1fr] items-baseline gap-x-4 md:grid-cols-[auto_auto_1fr_auto] md:gap-x-6"
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 0.6, ease: EASE_OUT, delay: i * 0.08 }}
+                >
+                  <span className="font-body text-[13px] tracking-wide text-ink/45 md:text-sm">
+                    {row.period}
+                  </span>
+                  <span className="text-sienna" aria-hidden>
+                    ◆
+                  </span>
+                  <span className="font-body text-[13px] leading-snug text-ink md:text-sm">{row.role}</span>
+                  <span className="hidden font-body text-[13px] text-ink/45 md:block md:text-sm">
+                    {row.place}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Split CTA Panel (cta) ────────────────────────────────────────────────────
+
+function CTASection() {
+  return (
+    <section id="commission" className="relative z-10 bg-linen px-4 py-16 md:px-8 md:py-24">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-ink">
+        <div className="grid md:grid-cols-2">
+          {/* Left — the ask */}
+          <div className="flex flex-col justify-center px-8 py-16 md:px-14 md:py-20 lg:px-20">
+            <LineReveal
+              lines={["Deine Geschichte.", "Dein Stück."]}
+              lineClassName="font-heading font-bold italic text-white leading-[0.9] tracking-[-0.01em] text-[clamp(2rem,4.5vw,3.25rem)]"
+              className="mb-6"
+            />
+            <FadeUp delay={0.5}>
+              <p className="mb-10 max-w-sm font-body text-white/60">
+                Anfragen werden einzeln bearbeitet — nur eine begrenzte Anzahl
+                Aufträge pro Quartal.
+              </p>
+            </FadeUp>
+            <FadeUp delay={0.6}>
+              <div className="[&_input]:border-white/25 [&_input]:text-white [&_input]:focus:border-white [&_textarea]:border-white/25 [&_textarea]:text-white [&_textarea]:focus:border-white [&_label>span]:text-white/50 [&_button]:rounded-full [&_button]:bg-white [&_button]:px-8 [&_button]:py-3.5 [&_button]:text-xs [&_button]:uppercase [&_button]:tracking-[0.18em] [&_button]:text-ink [&_button]:transition-transform [&_button]:duration-300 [&_button]:hover:scale-[1.04] [&_button]:active:scale-95">
                 <ConversionForm
                   startStep="intent"
                   submitStep="convert"
@@ -505,152 +426,31 @@ function CommissionSection() {
                   fields={[
                     { name: "name", label: "Name", required: true },
                     { name: "email", label: "E-Mail", type: "email", required: true },
-                    {
-                      name: "vision",
-                      label: "Deine Idee — erzähl mir davon",
-                      type: "textarea",
-                    },
+                    { name: "vision", label: "Deine Idee — erzähl mir davon", type: "textarea" },
                   ]}
                 />
               </div>
             </FadeUp>
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
-// ── Atelier ───────────────────────────────────────────────────────────────────
-
-function AtelierSection() {
-  return (
-    <section id="atelier" className="relative z-10 bg-linen py-24 md:py-44 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20">
-        <FadeUp className="mb-14 md:mb-20">
-          <span className="text-[11px] font-body uppercase tracking-[0.22em] text-sienna block mb-2">
-            Das Atelier
-          </span>
-          <h2 className="font-heading font-bold text-ink text-[clamp(2rem,5vw,3.5rem)] leading-[1.0]">
-            Wien, Österreich
-          </h2>
-        </FadeUp>
-
-        <div className="flex gap-6 md:gap-10 overflow-x-auto pb-4 md:pb-0 md:overflow-x-visible">
-          {ATELIER_IMAGES.map((img, i) => (
-            <FadeUp
-              key={img.src}
-              delay={i * 0.15}
-              className="flex-shrink-0 w-[76vw] sm:w-[52vw] md:w-[calc(33.333%-1.667rem)]"
+          {/* Right — visual, slow Ken Burns drift */}
+          <div className="relative min-h-[320px] overflow-hidden md:min-h-0">
+            <motion.div
+              className="absolute inset-0"
+              animate={{ scale: [1, 1.08] }}
+              transition={{ duration: 22, repeat: Infinity, repeatType: "mirror", ease: "linear" }}
             >
-              <div className="relative aspect-[3/4] overflow-hidden">
-                <Image
-                  src={img.src}
-                  alt={img.caption}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 76vw, 33vw"
-                />
-              </div>
-              <p className="mt-3 text-xs font-body italic text-ink/50">
-                {img.caption}
-              </p>
-            </FadeUp>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Quotes ────────────────────────────────────────────────────────────────────
-
-function QuotesSection() {
-  return (
-    <section className="relative z-10 bg-surface py-24 md:py-44">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20">
-        <div className="space-y-20 md:space-y-32">
-          {QUOTES.map((q, i) => (
-            <FadeUp key={q.id} delay={i * 0.08}>
-              <blockquote
-                className={`max-w-2xl ${
-                  i === 1
-                    ? "ml-auto"
-                    : i === 2
-                    ? "md:ml-[20%]"
-                    : ""
-                }`}
-              >
-                <p className="font-heading font-medium italic text-ink leading-[1.2] text-[clamp(1.4rem,2.8vw,2.25rem)]">
-                  &ldquo;{q.text}&rdquo;
-                </p>
-                <cite className="block mt-5 text-xs font-body not-italic text-ink/45 uppercase tracking-[0.18em]">
-                  — {q.author}
-                </cite>
-              </blockquote>
-            </FadeUp>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── CTA ───────────────────────────────────────────────────────────────────────
-
-function CTASection() {
-  return (
-    <section className="relative z-10 min-h-[75vh] flex flex-col items-center justify-center overflow-hidden bg-ink">
-      {/* Own background video */}
-      <video
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-35"
-        autoPlay
-        muted
-        loop
-        playsInline
-      >
-        <source src="/videos/hero.mp4" type="video/mp4" />
-      </video>
-
-      {/* Gradient top */}
-      <div className="absolute inset-x-0 top-0 h-[200px] bg-gradient-to-b from-ink to-transparent z-10 pointer-events-none" />
-      {/* Gradient bottom */}
-      <div className="absolute inset-x-0 bottom-0 h-[200px] bg-gradient-to-t from-ink to-transparent z-10 pointer-events-none" />
-
-      <div className="relative z-20 text-center px-6 max-w-3xl w-full">
-        <LineReveal
-          lines={["Ein Drop.", "Wenige Stücke.", "Kein Nachdruck."]}
-          lineClassName="font-heading font-bold italic text-white leading-[0.88] tracking-[-0.01em] text-[clamp(2.25rem,6vw,5rem)]"
-          className="mb-8"
-        />
-        <FadeUp delay={0.5}>
-          <p className="font-body text-white/55 text-base md:text-lg mb-10 max-w-md mx-auto">
-            Nächster Drop angekündigt. Sei dabei, wenn neue Stücke in den Shop kommen.
-          </p>
-        </FadeUp>
-        <FadeUp delay={0.7}>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/shop">
-              <motion.span
-                whileHover={{ backgroundColor: "rgba(255,255,255,0.10)" }}
-                whileTap={{ scale: 0.97 }}
-                className="glass-btn inline-flex items-center justify-center px-8 py-3.5 font-body text-xs uppercase tracking-[0.18em] text-white rounded-full cursor-pointer"
-                onClick={() => track("intent")}
-              >
-                Shop ansehen
-              </motion.span>
-            </Link>
-            <motion.a
-              href="#commission"
-              onClick={() => track("intent")}
-              whileHover={{ backgroundColor: "rgba(242,201,76,0.92)", color: "#4A3728" }}
-              whileTap={{ scale: 0.97 }}
-              className="inline-flex items-center justify-center px-8 py-3.5 font-body text-xs uppercase tracking-[0.18em] text-ink bg-gold rounded-full cursor-pointer transition-colors duration-300"
-            >
-              Anfrage stellen
-            </motion.a>
+              <Image
+                src="/images/material.png"
+                alt="Pigmente und Denim im Atelier"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </motion.div>
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/50 via-transparent to-transparent md:bg-gradient-to-l" />
           </div>
-        </FadeUp>
+        </div>
       </div>
     </section>
   );
@@ -661,24 +461,11 @@ function CTASection() {
 export default function Home() {
   return (
     <>
-      {/* Fixed background video — z-0; hero section is transparent above it */}
-      <video
-        className="fixed inset-0 w-full h-screen object-cover z-0"
-        autoPlay
-        muted
-        loop
-        playsInline
-      >
-        <source src="/videos/hero.mp4" type="video/mp4" />
-      </video>
-
       <HeroSection />
-      <ManifestoStrip />
-      <ProcessSection />
-      <WorksSection />
-      <CommissionSection />
-      <AtelierSection />
-      <QuotesSection />
+      <ShowcaseSection />
+      <SocialProofSection />
+      <NumbersBand />
+      <TimelineSection />
       <CTASection />
     </>
   );
