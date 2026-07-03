@@ -14,6 +14,7 @@ export interface Post {
   date: string;
   description: string;
   html: string;
+  faq: { question: string; answer: string }[];
 }
 
 const POSTS_DIR = path.join(process.cwd(), "content", "posts");
@@ -51,12 +52,19 @@ export function getPosts(): Post[] {
       const raw = fs.readFileSync(path.join(POSTS_DIR, file), "utf8");
       const { meta, body } = parseFrontmatter(raw);
       const slug = (meta.slug || file.replace(/\.md$/, "")).toLowerCase();
+      const faq: { question: string; answer: string }[] = [];
+      for (let i = 1; i <= 5; i++) {
+        const q = meta[`faq${i}_q`];
+        const a = meta[`faq${i}_a`];
+        if (q && a) faq.push({ question: q, answer: a });
+      }
       posts.push({
         slug,
         title: meta.title || slug,
         date: meta.date || "",
         description: meta.description || "",
         html: marked.parse(body, { async: false }) as string,
+        faq,
       });
     } catch {
       continue;

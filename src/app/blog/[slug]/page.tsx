@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPost, getPosts } from "@/lib/posts";
 
+const SITE_URL = "https://9f0e90d0.run.linkworld.ai";
+
 export function generateStaticParams() {
   return getPosts().map((p) => ({ slug: p.slug }));
 }
@@ -14,7 +16,11 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) return {};
-  return { title: `${post.title} — JM Journal`, description: post.description };
+  return {
+    title: `${post.title} — JM Journal`,
+    description: post.description,
+    alternates: { canonical: `${SITE_URL}/blog/${post.slug}` },
+  };
 }
 
 export default async function BlogPost({
@@ -26,8 +32,43 @@ export default async function BlogPost({
   const post = getPost(slug);
   if (!post) notFound();
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date || undefined,
+    dateModified: post.date || undefined,
+    author: { "@type": "Person", name: "JM" },
+    publisher: { "@type": "Organization", name: "JM" },
+    mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
+  };
+
+  const faqJsonLd =
+    post.faq.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: post.faq.map((f) => ({
+            "@type": "Question",
+            name: f.question,
+            acceptedAnswer: { "@type": "Answer", text: f.answer },
+          })),
+        }
+      : null;
+
   return (
     <main className="min-h-screen bg-linen pt-28 md:pt-36 pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       <div className="max-w-2xl mx-auto px-6 md:px-12">
         <Link
           href="/blog"
