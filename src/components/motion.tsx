@@ -65,34 +65,46 @@ export function LineReveal({
   );
 }
 
-/** Word-stagger headline — every word its own span, fading up in sequence. */
+/**
+ * Word-stagger headline — every word its own span, fading up in sequence.
+ * `lines` are AUTHORED line breaks (not auto-wrap) so a headline can be
+ * composed of short, intentional lines; the stagger delay counts words
+ * continuously across all lines.
+ */
 export function WordStagger({
-  text,
+  lines,
   as: Tag = "h1",
   className,
   wordClassName,
 }: {
-  text: string;
+  lines: string[];
   as?: "h1" | "h2" | "div";
   className?: string;
   wordClassName?: string;
 }) {
   const reduced = useReducedMotion();
-  const words = text.split(" ");
+  let globalIndex = 0;
   return (
-    <Tag className={`flex flex-wrap gap-x-[0.25em] ${className ?? ""}`}>
-      {words.map((w, i) => (
-        <span key={i} className="overflow-hidden inline-block leading-[1.05] pb-[0.08em]">
-          <motion.span
-            initial={reduced ? {} : { opacity: 0, y: 32 }}
-            whileInView={reduced ? {} : { opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.15 + i * 0.08 }}
-            className={`inline-block ${wordClassName ?? ""}`}
-          >
-            {w}
-          </motion.span>
-        </span>
+    <Tag className={className}>
+      {lines.map((line, li) => (
+        <div key={li} className="flex flex-wrap gap-x-[0.25em]">
+          {line.split(" ").map((w) => {
+            const i = globalIndex++;
+            return (
+              <span key={i} className="overflow-hidden inline-block leading-[1.05] pb-[0.08em]">
+                <motion.span
+                  initial={reduced ? {} : { opacity: 0, y: 32 }}
+                  whileInView={reduced ? {} : { opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.15 + i * 0.08 }}
+                  className={`inline-block ${wordClassName ?? ""}`}
+                >
+                  {w}
+                </motion.span>
+              </span>
+            );
+          })}
+        </div>
       ))}
     </Tag>
   );

@@ -6,6 +6,8 @@ import {
   motion,
   useInView,
   useReducedMotion,
+  useScroll,
+  useTransform,
 } from "framer-motion";
 import ConversionForm from "@/components/ConversionForm";
 import { VideoLoop } from "@/components/VideoLoop";
@@ -78,25 +80,47 @@ const TIMELINE = [
 // ── Hero ──────────────────────────────────────────────────────────────────────
 
 function HeroSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const reduced = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, -40]);
+  const copyOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
+  const videoScale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
+
   return (
     <>
-      <div className="fixed inset-0 z-0 h-screen w-full">
+      <motion.div
+        className="fixed inset-0 z-0 h-screen w-full"
+        style={reduced ? undefined : { scale: videoScale }}
+      >
         <VideoLoop
           src="/videos/hero.mp4"
           poster="/images/hero.png"
           className="relative h-full w-full"
         />
-      </div>
+      </motion.div>
 
-      <section className="relative z-10 flex min-h-screen flex-col justify-center bg-transparent pb-16">
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-48 bg-gradient-to-b from-transparent to-linen" />
-        <div className="relative z-20 max-w-[720px] px-6 md:px-12 lg:px-20">
+      <section
+        ref={sectionRef}
+        className="relative z-10 flex min-h-screen flex-col justify-center bg-transparent pb-16"
+      >
+        {/* Engineered contrast scrim — dark toward the copy, clear toward the window light */}
+        <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(100deg,rgba(0,0,0,0.62)_0%,rgba(0,0,0,0.4)_38%,rgba(0,0,0,0.1)_62%,transparent_72%)]" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-56 bg-gradient-to-b from-transparent to-linen" />
+
+        <motion.div
+          style={reduced ? undefined : { y: copyY, opacity: copyOpacity }}
+          className="relative z-20 max-w-[720px] px-6 md:px-12 lg:px-20"
+        >
           <WordStagger
-            text="Kein Stück wie das andere."
+            lines={["Kein Stück", "wie das andere."]}
             className="font-heading font-bold text-white leading-[0.95] tracking-[-0.02em] text-[clamp(2.75rem,7.5vw,6rem)]"
           />
           <FadeUp delay={0.9} className="mt-6 max-w-sm">
-            <p className="font-body text-base leading-relaxed text-white/75 md:text-lg">
+            <p className="font-body text-base leading-relaxed text-white/85 md:text-lg">
               Jede Jacke ein Unikat — handbemalte Denim-Einzelstücke aus dem
               Atelier Wien.
             </p>
@@ -111,7 +135,22 @@ function HeroSection() {
               Der Prozess ↓
             </motion.a>
           </FadeUp>
-        </div>
+        </motion.div>
+
+        {/* Quiet scroll cue */}
+        <motion.div
+          style={reduced ? undefined : { opacity: copyOpacity }}
+          className="pointer-events-none absolute inset-x-0 bottom-9 z-20 flex flex-col items-center gap-2"
+        >
+          <span className="font-body text-[10px] uppercase tracking-[0.32em] text-white/50">
+            Scroll
+          </span>
+          <motion.span
+            className="h-8 w-px origin-top bg-white/40"
+            animate={reduced ? undefined : { scaleY: [0.3, 1, 0.3] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </motion.div>
       </section>
     </>
   );
@@ -132,24 +171,30 @@ function ShowcaseCaption({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { margin: "-45% 0% -45% 0%" });
+  const isActive = active === index;
 
   useEffect(() => {
     if (inView) setActive(index);
   }, [inView, index, setActive]);
 
   return (
-    <div ref={ref} className="flex min-h-[50vh] flex-col justify-center md:min-h-[60vh]">
-      <FadeUp>
-        <span className="mb-4 block text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
-          {item.label}
-        </span>
-        <h3 className="mb-4 font-heading font-bold text-ink leading-[1.05] text-[clamp(1.6rem,3.2vw,2.5rem)]">
-          {item.title}
-        </h3>
-        <p className="max-w-sm font-body text-base leading-[1.8] text-ink/60">
-          {item.body}
-        </p>
-      </FadeUp>
+    <div ref={ref} className="flex min-h-[90vh] flex-col justify-center">
+      <motion.div
+        animate={{ opacity: isActive ? 1 : 0.35 }}
+        transition={{ duration: 0.5, ease: EASE_OUT }}
+      >
+        <FadeUp>
+          <span className="mb-4 block text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+            {item.label}
+          </span>
+          <h3 className="mb-4 font-heading font-bold text-ink leading-[1.02] text-[clamp(2.5rem,4vw,4rem)]">
+            {item.title}
+          </h3>
+          <p className="max-w-sm font-body text-base leading-[1.8] text-ink/60">
+            {item.body}
+          </p>
+        </FadeUp>
+      </motion.div>
     </div>
   );
 }
@@ -185,8 +230,8 @@ function ShowcaseSection() {
             </div>
           </div>
 
-          {/* Captions — normal flow, drives the pin length exactly */}
-          <div className="flex flex-col gap-10 md:py-24">
+          {/* Captions — desktop only, normal flow, drives the pin length exactly */}
+          <div className="hidden flex-col md:flex">
             {SHOWCASE.map((item, i) => (
               <ShowcaseCaption key={item.image} index={i} active={active} setActive={setActive} item={item} />
             ))}
@@ -234,7 +279,7 @@ function ReviewCard({
       whileInView={reduced ? {} : { rotate: 0, y: 0, opacity: 1 }}
       viewport={{ once: true, amount: 0.3 }}
       transition={{ type: "spring", stiffness: 260, damping: 22, delay: index * 0.1 }}
-      className={`relative flex w-full flex-col justify-between rounded-sm p-8 shadow-[0_20px_50px_-20px_rgba(74,55,40,0.25)] md:w-1/3 md:min-h-[300px] ${
+      className={`relative flex w-full flex-col rounded-sm p-8 shadow-[0_20px_50px_-20px_rgba(74,55,40,0.25)] md:w-1/3 ${
         index > 0 ? "md:-ml-6" : ""
       } ${accent ? "bg-sienna text-white" : "bg-linen text-ink"}`}
       style={{ zIndex: 10 + index }}
@@ -263,17 +308,17 @@ function ReviewCard({
 
 function SocialProofSection() {
   return (
-    <section className="relative z-10 overflow-hidden bg-surface py-24 md:py-44">
+    <section className="relative z-10 overflow-hidden bg-gradient-to-b from-linen to-surface py-24 md:py-44">
       <div className="mx-auto max-w-6xl px-6 md:px-12 lg:px-20">
         <FadeUp className="mb-16 max-w-lg md:mb-24">
           <span className="mb-2 block text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
             Stimmen
           </span>
-          <h2 className="font-heading font-bold text-ink leading-[1.0] text-[clamp(2rem,5vw,3.25rem)]">
+          <h2 className="font-heading font-bold text-ink leading-[0.95] text-[clamp(2.75rem,5.5vw,4.5rem)]">
             Getragen. Erzählt.
           </h2>
         </FadeUp>
-        <div className="flex flex-col items-center gap-8 md:flex-row md:items-stretch md:gap-0">
+        <div className="flex flex-col items-center gap-8 md:flex-row md:items-start md:gap-0">
           {QUOTES.map((q, i) => (
             <ReviewCard key={q.id} quote={q} index={i} accent={i === 1} />
           ))}
@@ -311,8 +356,8 @@ function CountUpStat({ value, suffix, label }: { value: number; suffix: string; 
   }, [inView, reduced, value]);
 
   return (
-    <div ref={ref}>
-      <div className="font-heading font-bold tabular-nums leading-none text-linen text-[clamp(2.5rem,6vw,4rem)]">
+    <div ref={ref} className="text-center">
+      <div className="font-heading font-normal tabular-nums leading-none text-linen text-[clamp(3.25rem,7vw,5.5rem)]">
         {display}
         {suffix}
       </div>
@@ -323,14 +368,14 @@ function CountUpStat({ value, suffix, label }: { value: number; suffix: string; 
 
 function NumbersBand() {
   return (
-    <section className="relative z-10 bg-ink py-20 md:py-28">
-      <div className="mx-auto max-w-7xl px-6 md:px-12 lg:px-20">
-        <FadeUp className="mb-14 max-w-xl md:mb-20">
+    <section className="relative z-10 -mt-16 bg-gradient-to-b from-surface to-linen px-4 pb-16 pt-8 md:-mt-24 md:px-8 md:pb-24 md:pt-12">
+      <div className="mx-auto max-w-6xl rounded-[2.5rem] bg-ink px-6 py-24 shadow-[0_40px_90px_-40px_rgba(0,0,0,0.55)] md:px-16">
+        <FadeUp className="mx-auto mb-14 max-w-xl text-center md:mb-16">
           <p className="font-body text-sm leading-relaxed text-linen/50 md:text-base">
             Kein Fließband, keine Serie — nur Zeit, Farbe und ein Stück Stoff.
           </p>
         </FadeUp>
-        <div className="flex flex-col sm:flex-row">
+        <div className="mx-auto flex max-w-4xl flex-col sm:flex-row">
           {STATS.map((s, i) => (
             <div
               key={s.label}
@@ -359,7 +404,7 @@ function TimelineSection() {
               <span className="mb-2 block text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
                 Werdegang
               </span>
-              <h2 className="mb-6 font-heading font-bold text-ink leading-[1.0] text-[clamp(2rem,4.5vw,3rem)]">
+              <h2 className="mb-6 font-heading font-bold text-ink leading-[0.95] text-[clamp(2.75rem,5vw,4rem)]">
                 Wien, seit 2019.
               </h2>
               <p className="max-w-sm font-body text-base leading-[1.8] text-ink/60">
@@ -412,7 +457,7 @@ function CTASection() {
           <div className="flex flex-col justify-center px-8 py-16 md:px-14 md:py-20 lg:px-20">
             <LineReveal
               lines={["Deine Geschichte.", "Dein Stück."]}
-              lineClassName="font-heading font-bold italic text-white leading-[0.9] tracking-[-0.01em] text-[clamp(2rem,4.5vw,3.25rem)]"
+              lineClassName="font-heading font-bold italic text-white leading-[0.88] tracking-[-0.01em] text-[clamp(2.75rem,5vw,4.25rem)]"
               className="mb-6"
             />
             <FadeUp delay={0.5}>
