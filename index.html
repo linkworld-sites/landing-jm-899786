@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><style id='brand'>:root{
+  --bg:#0b0b0c; --surface:#141417; --surface-2:#1c1c21;
+  --fg:#f5f5f7; --fg-muted:#a1a1aa; --border:#26262b;
+  --accent:#3b82f6; --accent-fg:#fff; --radius:14px; --maxw:1100px;
+  --font:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--fg);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.container{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.section{padding:96px 0}
+.hero{padding:140px 0 90px;text-align:center}
+h1{font-size:clamp(2.5rem,6vw,4.5rem);line-height:1.05;letter-spacing:-.02em}
+h2{font-size:clamp(1.8rem,4vw,2.8rem);letter-spacing:-.01em}
+.muted{color:var(--fg-muted)}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--accent-fg);padding:14px 28px;border-radius:var(--radius);font-weight:600;text-decoration:none;border:0;cursor:pointer;transition:transform .15s ease,opacity .15s ease}
+.btn:hover{transform:translateY(-2px);opacity:.92}
+.btn-ghost{background:transparent;color:var(--fg);border:1px solid var(--border)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px}
+.grid{display:grid;gap:24px}
+@media(max-width:640px){.section{padding:64px 0}.hero{padding:96px 0 64px}}
+</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JM — Hand Painted Custom Denim Jackets</title>
+<style>
+  /* ── Brand token overrides ── */
+  :root {
+    --bg: #0e0c0a;
+    --surface: #1a1612;
+    --fg: #f5f0e8;
+    --fg-muted: #a89880;
+    --accent: #c8813a;
+    --border: #2e2720;
+    --radius: 6px;
+  }
+
+  /* ── Reset & base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Georgia', serif;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── Utility ── */
+  .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+  .section { padding: 96px 0; }
+  .muted { color: var(--fg-muted); }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 28px;
+  }
+  .grid { display: grid; gap: 28px; }
+  .grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #0e0c0a;
+    font-family: 'Georgia', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 14px 36px;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+  }
+  .btn:hover {
+    background: #e09340;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(200,129,58,0.35);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+    transition: background 0.25s, transform 0.2s;
+  }
+  .btn-ghost:hover {
+    background: rgba(200,129,58,0.12);
+    transform: translateY(-2px);
+  }
+
+  /* ── Noise texture overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.6;
+  }
+
+  /* ══════════════════════════════
+     NAV
+  ══════════════════════════════ */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 0;
+    transition: background 0.35s, padding 0.35s, border-bottom 0.35s;
+  }
+  nav.scrolled {
+    background: rgba(14,12,10,0.92);
+    backdrop-filter: blur(12px);
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  nav .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-logo {
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--fg);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--fg); }
+
+  /* ══════════════════════════════
+     HERO
+  ══════════════════════════════ */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 120px 0 80px;
+  }
+
+  /* Animated denim texture background */
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 3px,
+        rgba(255,255,255,0.012) 3px,
+        rgba(255,255,255,0.012) 6px
+      ),
+      radial-gradient(ellipse 80% 60% at 70% 50%, rgba(200,129,58,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 80% at 15% 30%, rgba(74,100,160,0.06) 0%, transparent 60%),
+      linear-gradient(160deg, #0e0c0a 0%, #12100d 40%, #1a1510 100%);
+  }
+
+  /* Floating paint stroke decorations */
+  .stroke {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    pointer-events: none;
+  }
+  .stroke-1 {
+    width: 500px; height: 300px;
+    background: radial-gradient(ellipse, rgba(200,129,58,0.15) 0%, transparent 70%);
+    top: 20%; right: -5%;
+    animation: drift1 8s ease-in-out infinite alternate;
+  }
+  .stroke-2 {
+    width: 300px; height: 400px;
+    background: radial-gradient(ellipse, rgba(74,100,180,0.1) 0%, transparent 70%);
+    bottom: 10%; left: -5%;
+    animation: drift2 10s ease-in-out infinite alternate;
+  }
+  .stroke-3 {
+    width: 200px; height: 200px;
+    background: radial-gradient(ellipse, rgba(180,80,80,0.08) 0%, transparent 70%);
+    top: 60%; right: 30%;
+    animation: drift1 12s ease-in-out infinite alternate-reverse;
+  }
+
+  @keyframes drift1 {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(-30px, 20px) scale(1.1); }
+  }
+  @keyframes drift2 {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(20px, -30px) scale(1.08); }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 680px;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 32px; height: 1.5px;
+    background: var(--accent);
+    display: block;
+  }
+
+  .hero h1 {
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    color: var(--fg);
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--fg-muted);
+    max-width: 520px;
+    margin-bottom: 44px;
+    line-height: 1.8;
+  }
+
+  .hero-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .hero-proof {
+    margin-top: 72px;
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+  .proof-item { }
+  .proof-num {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--fg);
+    line-height: 1;
+  }
+  .proof-num span { color: var(--accent); }
+  .proof-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    margin-top: 4px;
+  }
+
+  /* Scrolling marquee */
+  .marquee-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+    background: var(--surface);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 0;
+    animation: marquee 22s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee-track:hover { animation-play-state: paused; }
+  .marquee-item {
+    padding: 0 40px;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    flex-shrink: 0;
+  }
+  .marquee-item .dot {
+    color: var(--accent);
+    margin-right: 40px;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ══════════════════════════════
+     PROCESS SECTION
+  ══════════════════════════════ */
+  .section-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::before {
+    content: '';
+    width: 28px; height: 1.5px;
+    background: var(--accent);
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .section-intro {
+    font-size: 1.05rem;
+    color: var(--fg-muted);
+    max-width: 560px;
+    margin-bottom: 60px;
+  }
+
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  }
+  .step-card:hover {
+    border-color: rgba(200,129,58,0.4);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 48px rgba(0,0,0,0.4);
+  }
+  .step-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .step-card:hover::after { opacity: 1; }
+
+  .step-number {
+    font-size: 4.5rem;
+    font-weight: 700;
+    color: var(--border);
+    line-height: 1;
+    position: absolute;
+    top: 20px; right: 24px;
+    letter-spacing: -0.04em;
+    transition: color 0.3s;
+  }
+  .step-card:hover .step-number { color: rgba(200,129,58,0.15); }
+
+  .step-icon {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .step-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .step-card p {
+    font-size: 0.92rem;
+    color: var(--fg-muted);
+    line-height: 1.7;
+  }
+
+  /* ══════════════════════════════
+     STYLE GALLERY
+  ══════════════════════════════ */
+  .gallery-section { background: var(--surface); }
+
+  .style-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+
+  .style-card {
+    border-radius: var(--radius);
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    aspect-ratio: 3/4;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    transition: transform 0.35s, box-shadow 0.35s;
+  }
+  .style-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  }
+
+  .style-card-art {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 6rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Unique painted backgrounds for each card */
+  .art-1 {
+    background:
+      radial-gradient(ellipse 60% 40% at 30% 60%, rgba(200,129,58,0.4) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 70% 30%, rgba(100,60,180,0.3) 0%, transparent 60%),
+      linear-gradient(160deg, #1a1210 0%, #251a0e 100%);
+  }
+  .art-2 {
+    background:
+      radial-gradient(ellipse 70% 50% at 60% 40%, rgba(60,120,200,0.35) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 20% 70%, rgba(200,80,80,0.25) 0%, transparent 55%),
+      linear-gradient(160deg, #0e1218 0%, #121820 100%);
+  }
+  .art-3 {
+    background:
+      radial-gradient(ellipse 55% 55% at 50% 50%, rgba(60,180,100,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 20% 20%, rgba(200,170,58,0.3) 0%, transparent 55%),
+      linear-gradient(160deg, #0e1210 0%, #12180e 100%);
+  }
+  .art-4 {
+    background:
+      radial-gradient(ellipse 65% 45% at 50% 45%, rgba(220,80,140,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse 35% 45% at 75% 70%, rgba(58,140,200,0.25) 0%, transparent 55%),
+      linear-gradient(160deg, #180e12 0%, #1e1018 100%);
+  }
+
+  /* Painterly strokes inside each card */
+  .style-card-art::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -30deg,
+      transparent,
+      transparent 8px,
+      rgba(255,255,255,0.018) 8px,
+      rgba(255,255,255,0.018) 9px
+    );
+  }
+
+  .style-card-art .jacket-icon {
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.6));
+    font-size: 5rem;
+    transition: transform 0.35s;
+  }
+  .style-card:hover .jacket-icon { transform: scale(1.08) rotate(-3deg); }
+
+  .style-card-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 24px 20px 20px;
+    background: linear-gradient(to top, rgba(14,12,10,0.95) 0%, transparent 100%);
+    z-index: 3;
+  }
+  .style-card-info h4 {
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  .style-card-info span {
+    font-size: 0.78rem;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .style-tag {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: rgba(200,129,58,0.9);
+    color: #0e0c0a;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    z-index: 3;
+  }
+
+  /* ══════════════════════════════
+     WHY JM
+  ══════════════════════════════ */
+  .why-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  @media (max-width: 768px) {
+    .why-grid { grid-template-columns: 1fr; }
+  }
+
+  .why-visual {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .why-visual-inner {
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(ellipse 70% 50% at 40% 60%, rgba(200,129,58,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 70% 30%, rgba(74,100,180,0.2) 0%, transparent 60%),
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 5px,
+        rgba(255,255,255,0.015) 5px,
+        rgba(255,255,255,0.015) 10px
+      ),
+      linear-gradient(160deg, #12100d 0%, #1e1a14 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8rem;
+  }
+  .why-visual::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: -1px; right: -1px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent 70%);
+  }
+
+  .why-features { display: flex; flex-direction: column; gap: 28px; }
+  .why-item {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 20px;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .why-item:hover {
+    border-color: var(--border);
+    background: var(--surface);
+  }
+  .why-icon-wrap {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(200,129,58,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    border: 1px solid rgba(200,129,58,0.2);
+    transition: background 0.3s;
+  }
+  .why-item:hover .why-icon-wrap { background: rgba(200,129,58,0.2); }
+  .why-item h4 { font-size: 1rem; margin-bottom: 6px; }
+  .why-item p { font-size: 0.9rem; color: var(--fg-muted); line-height: 1.65; }
+
+  /* ══════════════════════════════
+     PRICING
+  ══════════════════════════════ */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 24px;
+    align-items: start;
+  }
+
+  .pricing-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px 32px;
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+  }
+  .pricing-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  }
+  .pricing-card.featured {
+    border-color: var(--accent);
+    background: linear-gradient(160deg, #1e1810 0%, #1a1612 100%);
+  }
+  .pricing-card.featured:hover {
+    box-shadow: 0 20px 50px rgba(200,129,58,0.25);
+  }
+
+  .pricing-badge {
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #0e0c0a;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+  }
+
+  .pricing-tier {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .pricing-price {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+    letter-spacing: -0.03em;
+  }
+  .pricing-price sup {
+    font-size: 1.3rem;
+    vertical-align: top;
+    margin-top: 8px;
+    display: inline-block;
+  }
+  .pricing-desc {
+    font-size: 0.88rem;
+    color: var(--fg-muted);
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+  .pricing-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .pricing-features li {
+    font-size: 0.88rem;
+    color: var(--fg-muted);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .pricing-features li::before {
+    content: '✦';
+    color: var(--accent);
+    font-size: 0.6rem;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+
+  .pricing-note {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 0.85rem;
+    color: var(--fg-muted);
+  }
+  .pricing-note a { color: var(--accent); text-decoration: none; }
+
+  /* ══════════════════════════════
+     TESTIMONIALS
+  ══════════════════════════════ */
+  .testimonials-section { background: var(--surface); }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .testimonial-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    position: relative;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .testimonial-card:hover {
+    border-color: rgba(200,129,58,0.3);
+    transform: translateY(-4px);
+  }
+  .testimonial-card::before {
+    content: '\201C';
+    position: absolute;
+    top: 16px; right: 24px;
+    font-size: 5rem;
+    color: var(--accent);
+    opacity: 0.15;
+    line-height: 1;
+    font-family: Georgia, serif;
+  }
+
+  .stars {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 16px;
+  }
+  .star { color: var(--accent); font-size: 0.85rem; }
+
+  .testimonial-text {
+    font-size: 0.95rem;
+    color: var(--fg-muted);
+    line-height: 1.75;
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .author-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .av-1 { background: rgba(200,129,58,0.2); }
+  .av-2 { background: rgba(74,100,180,0.2); }
+  .av-3 { background: rgba(100,180,100,0.2); }
+  .author-name { font-size: 0.9rem; font-weight: 600; }
+  .author-handle { font-size: 0.78rem; color: var(--fg-muted); }
+
+  /* ══════════════════════════════
+     CTA BANNER
+  ══════════════════════════════ */
+  .cta-banner {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 50%, rgba(200,129,58,0.12) 0%, transparent 70%),
+      var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 96px 0;
+    text-align: center;
+  }
+  .cta-banner h2 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  .cta-banner p {
+    font-size: 1.05rem;
+    color: var(--fg-muted);
+    max-width: 480px;
+    margin: 0 auto 40px;
+  }
+  .cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  /* ══════════════════════════════
+     FOOTER
+  ══════════════════════════════ */
+  footer {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 64px 0 40px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 56px;
+  }
+  @media (max-width: 768px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .footer-brand { grid-column: 1 / -1; }
+  }
+  @media (max-width: 480px) {
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+
+  .footer-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+    display: block;
+    color: var(--fg);
+    text-decoration: none;
+  }
+  .footer-logo span { color: var(--accent); }
+  .footer-tagline {
+    font-size: 0.88rem;
+    color: var(--fg-muted);
+    line-height: 1.7;
+    max-width: 260px;
+    margin-bottom: 24px;
+  }
+  .footer-socials {
+    display: flex;
+    gap: 12px;
+  }
+  .social-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: var(--fg-muted);
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .social-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(200,129,58,0.08);
+  }
+
+  .footer-col h5 {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg);
+    margin-bottom: 20px;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col ul a {
+    font-size: 0.88rem;
+    color: var(--fg-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-col ul a:hover { color: var(--fg); }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .footer-bottom p { font-size: 0.8rem; color: var(--fg-muted); }
+  .footer-bottom a { color: var(--accent); text-decoration: none; }
+  .footer-bottom-links { display: flex; gap: 24px; }
+  .footer-bottom-links a {
+    font-size: 0.8rem;
+    color: var(--fg-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-bottom-links a:hover { color: var(--fg); }
+
+  /* ══════════════════════════════
+     SCROLL REVEAL
+  ══════════════════════════════ */
+  .reveal {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.hidden {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+
+  /* ══════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════ */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hero h1 { font-size: 2.8rem; }
+    .hero-proof { gap: 28px; }
+    .section { padding: 64px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="container">
+    <a href="#" class="nav-logo">J<span>M</span></a>
+    <ul class="nav-links">
+      <li><a href="#process">Process</a></li>
+      <li><a href="#styles">Styles</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#pricing" class="btn" style="padding:10px 24px; font-size:0.8rem;">Commission Now</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="stroke stroke-1"></div>
+  <div class="stroke stroke-2"></div>
+  <div class="stroke stroke-3"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Hand Painted · One of a Kind</div>
+      <h1>Wear Art.<br>Live <em>Bold.</em></h1>
+      <p class="hero-sub">
+        JM creates custom hand-painted denim jackets that transform your vision into wearable art. Every brushstroke is intentional. Every piece is uniquely yours.
+      </p>
+      <div class="hero-cta">
+        <a href="#pricing" class="btn">Start Your Commission</a>
+        <a href="#styles" class="btn btn-ghost">View Styles</a>
+      </div>
+      <div class="hero-proof">
+        <div class="proof-item">
+          <div class="proof-num">300<span>+</span></div>
+          <div class="proof-label">Jackets Painted</div>
+        </div>
+        <div class="proof-item">
+          <div class="proof-num">12<span>+</span></div>
+          <div class="proof-label">Countries Shipped</div>
+        </div>
+        <div class="proof-item">
+          <div class="proof-num">100<span>%</span></div>
+          <div class="proof-label">Handcrafted</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="dot">✦</span>Hand Painted with Acrylic</div>
+    <div class="marquee-item"><span class="dot">✦</span>Fully Custom Designs</div>
+    <div class="marquee-item"><span class="dot">✦</span>Ships Worldwide</div>
+    <div class="marquee-item"><span class="dot">✦</span>2–3 Week Turnaround</div>
+    <div class="marquee-item"><span class="dot">✦</span>Bring Your Own Jacket</div>
+    <div class="marquee-item"><span class="dot">✦</span>100% Unique Pieces</div>
+    <div class="marquee-item"><span class="dot">✦</span>Portraits · Florals · Abstract</div>
+    <div class="marquee-item"><span class="dot">✦</span>Hand Painted with Acrylic</div>
+    <div class="marquee-item"><span class="dot">✦</span>Fully Custom Designs</div>
+    <div class="marquee-item"><span class="dot">✦</span>Ships Worldwide</div>
+    <div class="marquee-item"><span class="dot">✦</span>2–3 Week Turnaround</div>
+    <div class="marquee-item"><span class="dot">✦</span>Bring Your Own Jacket</div>
+    <div class="marquee-item"><span class="dot">✦</span>100% Unique Pieces</div>
+    <div class="marquee-item"><span class="dot">✦</span>Portraits · Florals · Abstract</div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<section class="section" id="process">
+  <div class="container">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">From Idea to<br>Wearable Masterpiece</h2>
+    <p class="section-intro">
+      A simple, collaborative process designed to bring your vision to life with zero guesswork and total creative freedom.
+    </p>
+    <div class="grid grid-3">
+      <div class="step-card reveal">
+        <span class="step-number">01</span>
+        <span class="step-icon">💬</span>
+        <h3>Share Your Vision</h3>
+        <p>Tell us your idea — a theme, an image, a feeling. Send references, mood boards, or just a few words. We'll shape it into a concept.</p>
+      </div>
+      <div class="step-card reveal">
+        <span class="step-number">02</span>
+        <span class="step-icon">🎨</span>
+        <h3>Sketch & Approve</h3>
+        <p>We draft a detailed sketch for your approval before a single stroke of paint touches fabric. Revisions included — no surprises.</p>
+      </div>
+      <div class="step-card reveal">
+        <span class="step-number">03</span>
+        <span class="step-icon">✋</span>
+        <h3>Hand Painted</h3>
+        <p>Using professional-grade fabric acrylics, we paint your design by hand. Each layer is sealed for wash-resistant, long-lasting colour.</p>
+      </div>
+      <div class="step-card reveal">
+        <span class="step-number">04</span>
+        <span class="step-icon">📦</span>
+        <h3>Delivered to You</h3>
+        <p>Your jacket arrives carefully packaged with care instructions. Worldwide shipping, tracked and insured every step of the way.</p>
+      </div>
+      <div class="step-card reveal">
+        <span class="step-number">05</span>
+        <span class="step-icon">🌟</span>
+        <h3>Wear It Forever</h3>
+        <p>Your one-of-a-kind piece is built to last. Colours stay vibrant wash after wash — a wearable artwork for years to come.</p>
+      </div>
+      <div class="step-card reveal" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; background: linear-gradient(135deg, rgba(200,129,58,0.12), rgba(200,129,58,0.04));">
+        <div style="font-size:2.5rem; margin-bottom:16px;">✦</div>
+        <h3 style="margin-bottom:12px;">Ready to Start?</h3>
+        <p style="margin-bottom:24px;">Commission slots are limited. Book yours before they fill up.</p>
+        <a href="#pricing" class="btn" style="font-size:0.8rem; padding:12px 24px;">View Pricing</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STYLE GALLERY -->
+<section class="section gallery-section" id="styles">
+  <div class="container">
+    <div class="section-label">Style Directory</div>
+    <h2 class="section-title">Choose Your Canvas</h2>
+    <p class="section-intro">
+      From bold abstract washes to intricate portraits — every style is fully customisable to your vision.
+    </p>
+    <div class="style-grid">
+      <div class="style-card reveal">
+        <div class="style-card-art art-1">
+          <span class="jacket-icon">🧥</span>
+        </div>
+        <span class="style-tag">Most Popular</span>
+        <div class="style-card-info">
+          <h4>Botanical & Florals</h4>
+          <span>Roses · Botanicals · Wildflowers</span>
+        </div>
+      </div>
+      <div class="style-card reveal">
+        <div class="style-card-art art-2">
+          <span class="jacket-icon">🧥</span>
+        </div>
+        <div class="style-card-info">
+          <h4>Portrait & Figurative</h4>
+          <span>Pets · People · Icons</span>
+        </div>
+      </div>
+      <div class="style-card reveal">
+        <div class="style-card-art art-3">
+          <span class="jacket-icon">🧥</span>
+        </div>
+        <div class="style-card-info">
+          <h4>Abstract Expression</h4>
+          <span>Colour Fields · Strokes · Texture</span>
+        </div>
+      </div>
+      <div class="style-card reveal">
+        <div class="style-card-art art-4">
+          <span class="jacket-icon">🧥</span>
+        </div>
+        <span class="style-tag">New 2026</span>
+        <div class="style-card-info">
+          <h4>Mythology & Story</h4>
+          <span>Folk Art · Cosmic · Narrative</span>
+        </div>
+      </div>
+    </div>
+    <p class="muted" style="margin-top: 28px; font-size:0.9rem; text-align:center;">
+      Don't see your style? We paint anything. <a href="#contact" style="color:var(--accent); text-decoration:none;">Describe your vision →</a>
+    </p>
+  </div>
+</section>
+
+<!-- WHY JM -->
+<section class="section">
+  <div class="container">
+    <div class="why-grid">
+      <div>
+        <div class="section-label">Why JM</div>
+        <h2 class="section-title" style="margin-bottom:16px;">Craft You Can<br>Feel in Every Thread</h2>
+        <p style="font-size:1rem; color:var(--fg-muted); margin-bottom:40px; line-height:1.8;">
+          We're not a print shop. Every jacket that leaves our studio carries hours of focused, intentional brushwork. That difference shows.
+        </p>
+        <div class="why-features">
+          <div class="why-item reveal">
+            <div class="why-icon-wrap">🎨</div>
+            <div>
+              <h4>100% Hand Painted</h4>
+              <p>No transfers, no prints, no shortcuts. Every design is painted directly onto fabric by hand using professional acrylic paint.</p>
+            </div>
+          </div>
+          <div class="why-item reveal">
+            <div class="why-icon-wrap">🔒</div>
+            <div>
+              <h4>Wash-Resistant Finish</h4>
+              <p>We use a professional heat-set and sealing process so your artwork remains vibrant through regular washing for years.</p>
+            </div>
+          </div>
+          <div class="why-item reveal">
+            <div class="why-icon-wrap">👁️</div>
+            <div>
+              <h4>Sketch Approval Before Paint</h4>
+              <p>You sign off on the design before we touch your jacket. Full transparency, no surprises — your satisfaction is guaranteed.</p>
+            </div>
+          </div>
+          <div class="why-item reveal">
+            <div class="why-icon-wrap">🌍</div>
+            <div>
+              <h4>Ship Your Jacket to Us</h4>
+              <p>We work with jackets you already own and love. Send us any denim — vintage, brand new, or sentimental. We'll transform it.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="why-visual reveal">
+        <div class="why-visual-inner">🎨</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing" style="background: var(--surface);">
+  <div class="container">
+    <div class="section-label">Investment</div>
+    <h2 class="section-title">Pricing That Reflects<br>True Craft</h2>
+    <p class="section-intro">
+      Each tier reflects the complexity and time behind the work. All pieces are one-of-a-kind — there are no duplicate commissions.
+    </p>
+    <div class="pricing-grid">
+      <div class="pricing-card reveal">
+        <div class="pricing-tier">Essential</div>
+        <div class="pricing-price"><sup>£</sup>120</div>
+        <div class="pricing-desc">A single focused design element — perfect for a signature touch.</div>
+        <ul class="pricing-features">
+          <li>One design panel (back or front)</li>
+          <li>Up to 2 colours palette</li>
+          <li>Simple motif or text</li>
+          <li>1 revision round</li>
+          <li>2-week turnaround</li>
+          <li>Care instruction card</li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost" style="width:100%; text-align:center; display:block;">Enquire</a>
+      </div>
+      <div class="pricing-card featured reveal">
+        <div class="pricing-badge">Most Popular</div>
+        <div class="pricing-tier">Signature</div>
+        <div class="pricing-price"><sup>£</sup>220</div>
+        <div class="pricing-desc">A full artistic statement — detailed design across the back panel.</div>
+        <ul class="pricing-features">
+          <li>Full back panel painting</li>
+          <li>Unlimited colour palette</li>
+          <li>Complex illustration or portrait</li>
+          <li>2 revision rounds</li>
+          <li>2–3 week turnaround</li>
+          <li>Premium packaging</li>
+          <li>Certificate of authenticity</li>
+        </ul>
+        <a href="#contact" class="btn" style="width:100%; text-align:center; display:block;">Commission Now</a>
+      </div>
+      <div class="pricing-card reveal">
+        <div class="pricing-tier">Collector</div>
+        <div class="pricing-price"><sup>£</sup>380<span style="font-size:1rem; font-weight:400; color:var(--fg-muted);">+</span></div>
+        <div class="pricing-desc">Full jacket coverage — every panel a canvas. The ultimate statement piece.</div>
+        <ul class="pricing-features">
+          <li>All panels painted (front, back, sleeves)</li>
+          <li>Multi-scene or wrap-around design</li>
+          <li>Unlimited revisions</li>
+          <li>Priority 2-week turnaround</li>
+          <li>Luxury gift packaging</li>
+          <li>Certificate + artist statement</li>
+          <li>Social feature on JM feed</li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost" style="width:100%; text-align:center; display:block;">Enquire</a>
+      </div>
+    </div>
+    <p class="pricing-note">
+      Custom quotes available for group orders, brands & events. <a href="#contact">Get in touch →</a>
+    </p>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section testimonials-section" id="testimonials">
+  <div class="container">
+    <div class="section-label">What Clients Say</div>
+    <h2 class="section-title" style="margin-bottom:48px;">Worn & Loved</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <div class="stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <p class="testimonial-text">"The detail on my floral jacket is unbelievable. I get stopped on the street every single time I wear it. JM understood exactly what I wanted — even when I couldn't fully describe it."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar av-1">🌸</div>
+          <div>
+            <div class="author-name">Sofia R.</div>
+            <div class="author-handle">@sofiastyle · London</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <div class="stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <p class="testimonial-text">"I sent my late grandmother's denim jacket and asked for a portrait of her dog. What came back made me cry. The care and skill that went into it was extraordinary. Worth every penny."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar av-2">🐾</div>
+          <div>
+            <div class="author-name">Marcus T.</div>
+            <div class="author-handle">@mt.creates · Manchester</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <div class="stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <p class="testimonial-text">"Ordered the Collector tier for our band's merch. Every member got a unique piece based on the same theme. The cohesion and individuality at the same time — genuinely impressive craftsmanship."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar av-3">🎸</div>
+          <div>
+            <div class="author-name">Elara & The Drift</div>
+            <div class="author-handle">@elaraandthedrift · Glasgow</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner" id="contact">
+  <div class="container">
+    <div class="section-label" style="justify-content:center; margin-bottom:24px;">Ready?</div>
+    <h2>Your Story,<br>Painted in Denim.</h2>
+    <p>Commission slots are limited each month. Reach out to start the conversation — no obligation, just a chat about your vision.</p>
+    <div class="cta-actions">
+      <a href="mailto:hello@jmpaints.com" class="btn">Email Us to Commission</a>
+      <a href="https://www.instagram.com/" class="btn btn-ghost">Follow on Instagram</a>
+    </div>
+    <p class="muted" style="margin-top:24px; font-size:0.82rem;">hello@jmpaints.com · Usually replies within 24 hours</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="footer-logo">J<span>M</span></a>
+        <p class="footer-tagline">Hand-painted custom denim jackets. Every piece a wearable work of art, made with intention and shipped worldwide.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-btn" aria-label="Instagram">📷</a>
+          <a href="#" class="social-btn" aria-label="TikTok">🎵</a>
+          <a href="#" class="social-btn" aria-label="Pinterest">📌</a>
+          <a href="#" class="social-btn" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Commission</h5>
+        <ul>
+          <li><a href="#process">How It Works</a></li>
+          <li><a href="#styles">Style Catalogue</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#contact">Start a Commission</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Info</h5>
+        <ul>
+          <li><a href="#">About JM</a></li>
+          <li><a href="#">Care Guide</a></li>
+          <li><a href="#">Shipping Info</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Policies</h5>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Refund Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 JM. All rights reserved. Crafted with ❤ and paint.</p>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+  }, { passive: true });
+
+  // Scroll reveal — enhances already-visible content
+  const reveals = document.querySelectorAll('.reveal');
+
+  function checkReveal() {
+    const windowHeight = window.innerHeight;
+    reveals.forEach(el => {
+      const top = el.getBoundingClientRect().top;
+      if (top < windowHeight - 60) {
+        el.classList.remove('hidden');
+      }
+    });
+  }
+
+  // Set hidden only if below fold on load
+  reveals.forEach(el => {
+    const top = el.getBoundingClientRect().top;
+    if (top > window.innerHeight - 60) {
+      el.classList.add('hidden');
+    }
+  });
+
+  window.addEventListener('scroll', checkReveal, { passive: true });
+  checkReveal();
+
+  // Stagger reveal children inside grids
+  document.querySelectorAll('.grid .reveal, .pricing-grid .reveal, .testimonials-grid .reveal, .style-grid .reveal').forEach((el, i) => {
+    el.style.transitionDelay = (i % 4) * 0.1 + 's';
+  });
+
+  // Card tilt micro-interaction
+  document.querySelectorAll('.step-card, .testimonial-card, .pricing-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `translateY(-6px) rotateX(${-y * 4}deg) rotateY(${x * 4}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+</script>
+</body>
+</html>
