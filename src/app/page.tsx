@@ -9,6 +9,7 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
+import { Diamond, PenTool } from "lucide-react";
 import ConversionForm from "@/components/ConversionForm";
 import { VideoLoop } from "@/components/VideoLoop";
 import { TiltStage } from "@/components/TiltStage";
@@ -122,21 +123,22 @@ function HeroSection() {
           className="relative z-20 max-w-[720px] px-6 md:px-12 lg:px-20"
         >
           <WordStagger
+            mount
             lines={["Kein Stück", "wie das andere."]}
-            className="font-heading font-bold text-white leading-[0.95] tracking-[-0.02em] text-[clamp(2.75rem,7.5vw,6rem)]"
+            className="font-heading font-medium text-white leading-[0.95] tracking-[-0.02em] text-[clamp(2.75rem,7.5vw,6rem)]"
           />
-          <FadeUp delay={0.9} className="mt-6 max-w-sm">
+          <FadeUp mount delay={0.9} className="mt-6 max-w-sm">
             <p className="font-body text-base leading-relaxed text-white/85 md:text-lg">
               Jede Jacke ein Unikat — handbemalte Denim-Einzelstücke aus dem
               Atelier Wien.
             </p>
           </FadeUp>
-          <FadeUp delay={1.1} className="mt-10">
+          <FadeUp mount delay={1.1} className="mt-10">
             <motion.a
               href="#showcase"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="glass-btn inline-flex items-center gap-2 rounded-full px-6 py-3 font-body text-xs uppercase tracking-[0.18em] text-white"
+              className="liquid-glass inline-flex items-center gap-2 rounded-full px-6 py-3 font-body text-xs uppercase tracking-[0.18em] text-white"
             >
               Der Prozess ↓
             </motion.a>
@@ -190,10 +192,11 @@ function ShowcaseCaption({
         transition={{ duration: 0.5, ease: EASE_OUT }}
       >
         <FadeUp>
-          <span className="mb-4 block text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+          <span className="mb-4 flex items-center gap-2 text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+            <PenTool className="h-3 w-3" strokeWidth={1.5} aria-hidden />
             {item.label}
           </span>
-          <h3 className="mb-4 font-heading font-bold text-ink leading-[1.02] text-[clamp(2.5rem,4vw,4rem)]">
+          <h3 className="mb-4 font-heading font-medium text-ink leading-[1.02] text-[clamp(2.5rem,4vw,4rem)]">
             {item.title}
           </h3>
           <p className="max-w-sm font-body text-base leading-[1.8] text-ink/60">
@@ -246,7 +249,7 @@ function ShowcaseSection() {
               </div>
               <div
                 aria-hidden
-                className="glass-btn absolute -bottom-4 -right-4 flex h-16 w-16 items-center justify-center rounded-full text-center"
+                className="liquid-glass absolute -bottom-4 -right-4 flex h-16 w-16 items-center justify-center rounded-full text-center"
                 style={{ transform: "translateZ(60px) rotate(-6deg)" }}
               >
                 <span className="font-heading italic leading-tight text-white text-[11px]">
@@ -272,10 +275,11 @@ function ShowcaseSection() {
                 <div className="relative mb-6 aspect-[4/5] w-full overflow-hidden rounded-sm">
                   <Image src={item.image} alt={item.title} fill className="object-cover" sizes="100vw" />
                 </div>
-                <span className="mb-3 block text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+                <span className="mb-3 flex items-center gap-2 text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+                  <PenTool className="h-3 w-3" strokeWidth={1.5} aria-hidden />
                   {item.label}
                 </span>
-                <h3 className="mb-3 font-heading font-bold text-ink leading-[1.05] text-[clamp(1.5rem,5vw,2rem)]">
+                <h3 className="mb-3 font-heading font-medium text-ink leading-[1.05] text-[clamp(1.5rem,5vw,2rem)]">
                   {item.title}
                 </h3>
                 <p className="font-body text-base leading-[1.8] text-ink/60">{item.body}</p>
@@ -339,10 +343,11 @@ function SocialProofSection() {
     <section className="relative z-10 overflow-hidden bg-gradient-to-b from-linen to-surface py-24 md:py-44">
       <div className="mx-auto max-w-6xl px-6 md:px-12 lg:px-20">
         <FadeUp className="mb-16 max-w-lg md:mb-24">
-          <span className="mb-2 block text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+          <span className="mb-2 flex items-center gap-2 text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+            <PenTool className="h-3 w-3" strokeWidth={1.5} aria-hidden />
             Stimmen
           </span>
-          <h2 className="font-heading font-bold text-ink leading-[0.95] text-[clamp(2.75rem,5.5vw,4.5rem)]">
+          <h2 className="font-heading font-medium text-ink leading-[0.95] text-[clamp(2.75rem,5.5vw,4.5rem)]">
             Getragen. Erzählt.
           </h2>
         </FadeUp>
@@ -397,7 +402,7 @@ function CountUpStat({ value, suffix, label }: { value: number; suffix: string; 
 function NumbersBand() {
   return (
     <section className="relative z-10 -mt-16 bg-gradient-to-b from-surface to-linen px-4 pb-16 pt-8 md:-mt-24 md:px-8 md:pb-24 md:pt-12">
-      <div className="mx-auto max-w-6xl rounded-[2.5rem] bg-ink px-6 py-24 shadow-[0_40px_90px_-40px_rgba(0,0,0,0.55)] md:px-16">
+      <div className="noise-overlay mx-auto max-w-6xl rounded-[2.5rem] bg-ink px-6 py-24 shadow-[0_40px_90px_-40px_rgba(0,0,0,0.55)] md:px-16">
         <FadeUp className="mx-auto mb-14 max-w-xl text-center md:mb-16">
           <p className="font-body text-sm leading-relaxed text-linen/50 md:text-base">
             Kein Fließband, keine Serie — nur Zeit, Farbe und ein Stück Stoff.
@@ -429,10 +434,11 @@ function TimelineSection() {
         <div className="grid gap-14 md:grid-cols-5 md:gap-0">
           <div className="md:col-span-2">
             <FadeUp>
-              <span className="mb-2 block text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+              <span className="mb-2 flex items-center gap-2 text-[11px] font-body uppercase tracking-[0.22em] text-sienna">
+                <PenTool className="h-3 w-3" strokeWidth={1.5} aria-hidden />
                 Werdegang
               </span>
-              <h2 className="mb-6 font-heading font-bold text-ink leading-[0.95] text-[clamp(2.75rem,5vw,4rem)]">
+              <h2 className="mb-6 font-heading font-medium text-ink leading-[0.95] text-[clamp(2.75rem,5vw,4rem)]">
                 Wien, seit 2019.
               </h2>
               <p className="max-w-sm font-body text-base leading-[1.8] text-ink/60">
@@ -457,9 +463,7 @@ function TimelineSection() {
                   <span className="font-body text-[13px] tracking-wide text-ink/45 md:text-sm">
                     {row.period}
                   </span>
-                  <span className="text-sienna" aria-hidden>
-                    ◆
-                  </span>
+                  <Diamond className="h-3 w-3 text-sienna" strokeWidth={1.5} aria-hidden />
                   <span className="font-body text-[13px] leading-snug text-ink md:text-sm">{row.role}</span>
                   <span className="hidden font-body text-[13px] text-ink/45 md:block md:text-sm">
                     {row.place}
@@ -485,7 +489,7 @@ function CTASection() {
           <div className="flex flex-col justify-center px-8 py-16 md:px-14 md:py-20 lg:px-20">
             <LineReveal
               lines={["Deine Geschichte.", "Dein Stück."]}
-              lineClassName="font-heading font-bold italic text-white leading-[0.88] tracking-[-0.01em] text-[clamp(2.75rem,5vw,4.25rem)]"
+              lineClassName="font-heading font-medium italic text-white leading-[0.88] tracking-[-0.01em] text-[clamp(2.75rem,5vw,4.25rem)]"
               className="mb-6"
             />
             <FadeUp delay={0.5}>

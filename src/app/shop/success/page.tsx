@@ -16,7 +16,7 @@ export default function ShopSuccess() {
         <span className="text-[11px] font-body uppercase tracking-[0.22em] text-sienna block mb-6">
           Bestellung bestätigt
         </span>
-        <h1 className="font-heading font-bold text-ink text-[clamp(2rem,5vw,3.5rem)] leading-[1.0] mb-6">
+        <h1 className="font-heading font-medium text-ink text-[clamp(2rem,5vw,3.5rem)] leading-[1.0] mb-6">
           Danke.
         </h1>
         <p className="font-body text-ink/65 text-base leading-relaxed mb-8">

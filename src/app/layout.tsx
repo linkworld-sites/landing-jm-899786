@@ -32,6 +32,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="de" className={`${fraunces.variable} ${inter.variable}`}>
       <body className="bg-linen text-ink font-body antialiased">
+        {/* No-JS fallback: scroll/mount-triggered reveals render opacity:0
+            inline until a script runs them; without JS that never happens,
+            so force everything visible. */}
+        <noscript>
+          <style>{`[style*="opacity:0"],[style*="opacity: 0"]{opacity:1 !important;transform:none !important;}`}</style>
+        </noscript>
         <FunnelTracker />
         <Nav />
         <SmoothScroll>{children}</SmoothScroll>

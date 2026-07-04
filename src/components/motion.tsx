@@ -5,23 +5,33 @@ import { motion, useReducedMotion } from "framer-motion";
 export const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
 export const EASE_EDITORIAL: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-/** Fade-up entrance reveal — the one reusable reveal used page-wide. */
+/**
+ * Fade-up entrance reveal — the one reusable reveal used page-wide.
+ * `mount` animates immediately once mounted instead of waiting on a
+ * scroll-linked IntersectionObserver — use it for content that is already
+ * in the viewport at load (the hero), where "reveal on scroll into view"
+ * doesn't apply and gating on it only risks content that never appears.
+ */
 export function FadeUp({
   children,
   delay = 0,
   className,
+  mount = false,
 }: {
   children: React.ReactNode;
   delay?: number;
   className?: string;
+  mount?: boolean;
 }) {
   const reduced = useReducedMotion();
+  const visible = { opacity: 1, y: 0 };
   return (
     <motion.div
       initial={reduced ? {} : { opacity: 0, y: 24 }}
-      whileInView={reduced ? {} : { opacity: 1, y: 0 }}
+      animate={mount ? (reduced ? {} : visible) : undefined}
+      whileInView={mount ? undefined : reduced ? {} : visible}
       transition={{ duration: 0.8, ease: EASE_OUT, delay }}
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={mount ? undefined : { once: true, amount: 0.2 }}
       className={className}
     >
       {children}
@@ -76,13 +86,17 @@ export function WordStagger({
   as: Tag = "h1",
   className,
   wordClassName,
+  mount = false,
 }: {
   lines: string[];
   as?: "h1" | "h2" | "div";
   className?: string;
   wordClassName?: string;
+  /** Animate on mount rather than on scroll-into-view — see FadeUp. */
+  mount?: boolean;
 }) {
   const reduced = useReducedMotion();
+  const visible = { opacity: 1, y: 0 };
   let globalIndex = 0;
   return (
     <Tag className={className}>
@@ -94,8 +108,9 @@ export function WordStagger({
               <span key={i} className="overflow-hidden inline-block leading-[1.05] pb-[0.08em]">
                 <motion.span
                   initial={reduced ? {} : { opacity: 0, y: 32 }}
-                  whileInView={reduced ? {} : { opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
+                  animate={mount ? (reduced ? {} : visible) : undefined}
+                  whileInView={mount ? undefined : reduced ? {} : visible}
+                  viewport={mount ? undefined : { once: true, amount: 0.2 }}
                   transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.15 + i * 0.08 }}
                   className={`inline-block ${wordClassName ?? ""}`}
                 >

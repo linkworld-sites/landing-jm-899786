@@ -83,7 +83,7 @@ export default async function BlogPost({
               {post.date}
             </time>
           )}
-          <h1 className="font-heading font-bold text-ink text-[clamp(2rem,5vw,3.5rem)] leading-[1.0] mb-4">
+          <h1 className="font-heading font-medium text-ink text-[clamp(2rem,5vw,3.5rem)] leading-[1.0] mb-4">
             {post.title}
           </h1>
           {post.description && (

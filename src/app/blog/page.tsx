@@ -16,7 +16,7 @@ export default function BlogIndex() {
           <span className="text-[11px] font-body uppercase tracking-[0.22em] text-sienna block mb-3">
             Journal
           </span>
-          <h1 className="font-heading font-bold text-ink text-[clamp(2.5rem,6vw,4rem)] leading-[0.95]">
+          <h1 className="font-heading font-medium text-ink text-[clamp(2.5rem,6vw,4rem)] leading-[0.95]">
             Aus dem Atelier
           </h1>
         </div>
