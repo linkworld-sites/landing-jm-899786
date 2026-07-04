@@ -11,7 +11,13 @@ import {
 } from "framer-motion";
 import ConversionForm from "@/components/ConversionForm";
 import { VideoLoop } from "@/components/VideoLoop";
+import { TiltStage } from "@/components/TiltStage";
 import { FadeUp, LineReveal, WordStagger, EASE_OUT } from "@/components/motion";
+
+// The one element no competitor could ship after a logo swap: the pinned
+// showcase photo is a pointer-tiltable object riding a raw-canvas backing,
+// varnish gleam and a floating "signiert & datiert" tag — the atelier's
+// signature-as-authenticity USP made into the page's living centerpiece.
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -206,28 +212,50 @@ function ShowcaseSection() {
     <section id="showcase" className="relative z-10 bg-linen py-24 md:py-0">
       <div className="mx-auto max-w-7xl px-6 md:px-12 lg:px-20">
         <div className="md:grid md:grid-cols-2 md:gap-16 lg:gap-24">
-          {/* Pinned visual — desktop only */}
+          {/* Pinned visual — desktop only. Signature interactive scene: a
+              pointer-tiltable stage with a raw-canvas backing behind the photo,
+              a varnish gleam in front, and a floating signature tag riding
+              closest to the viewer. */}
           <div className="hidden md:sticky md:top-0 md:flex md:h-screen md:items-center">
-            <div className="relative aspect-[4/5] w-full max-h-[70vh] overflow-hidden rounded-sm">
-              {SHOWCASE.map((item, i) => (
-                <motion.div
-                  key={item.image}
-                  className="absolute inset-0"
-                  initial={false}
-                  animate={{ opacity: active === i ? 1 : 0, scale: active === i ? 1 : 1.03 }}
-                  transition={{ duration: 0.7, ease: EASE_OUT }}
-                >
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 45vw"
-                    priority={i === 0}
-                  />
-                </motion.div>
-              ))}
-            </div>
+            <TiltStage className="relative w-full max-h-[70vh] aspect-[4/5]">
+              <div
+                aria-hidden
+                className="absolute inset-0 -z-10 rounded-sm bg-[radial-gradient(circle_at_30%_20%,rgba(201,74,43,0.18),transparent_60%),linear-gradient(135deg,#DDD2BB,#C7B99C)]"
+                style={{ transform: "translateZ(-40px) scale(1.08) rotate(-1.5deg)" }}
+              />
+              <div className="relative h-full w-full overflow-hidden rounded-sm">
+                {SHOWCASE.map((item, i) => (
+                  <motion.div
+                    key={item.image}
+                    className="absolute inset-0"
+                    initial={false}
+                    animate={{ opacity: active === i ? 1 : 0, scale: active === i ? 1 : 1.03 }}
+                    transition={{ duration: 0.7, ease: EASE_OUT }}
+                  >
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 45vw"
+                      priority={i === 0}
+                    />
+                  </motion.div>
+                ))}
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.16)_0%,transparent_28%,transparent_72%,rgba(0,0,0,0.14)_100%)]" />
+              </div>
+              <div
+                aria-hidden
+                className="glass-btn absolute -bottom-4 -right-4 flex h-16 w-16 items-center justify-center rounded-full text-center"
+                style={{ transform: "translateZ(60px) rotate(-6deg)" }}
+              >
+                <span className="font-heading italic leading-tight text-white text-[11px]">
+                  signiert
+                  <br />
+                  &amp; datiert
+                </span>
+              </div>
+            </TiltStage>
           </div>
 
           {/* Captions — desktop only, normal flow, drives the pin length exactly */}
