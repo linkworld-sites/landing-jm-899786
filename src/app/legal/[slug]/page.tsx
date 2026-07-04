@@ -29,16 +29,16 @@ export default async function LegalPage({
   if (!page) notFound();
 
   return (
-    <main className="min-h-screen bg-linen pt-28 md:pt-36 pb-24">
+    <main className="min-h-screen bg-noir pt-28 md:pt-36 pb-24">
       <div className="max-w-2xl mx-auto px-6 md:px-12">
         <Link
           href="/"
-          className="text-xs font-body uppercase tracking-[0.18em] text-ink/45 hover:text-sienna transition-colors"
+          className="font-mono text-xs uppercase tracking-[0.18em] text-paper/45 hover:text-acid transition-colors"
         >
           ← JM
         </Link>
         <article
-          className="post-body font-body text-ink/80 text-base mt-12"
+          className="post-body font-label text-paper/80 text-base mt-12 [&_a]:text-acid [&_blockquote]:border-acid"
           dangerouslySetInnerHTML={{ __html: page.html }}
         />
       </div>

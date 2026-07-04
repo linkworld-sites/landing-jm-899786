@@ -6,6 +6,13 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { track } from "@/lib/funnel";
 
+const LINKS = [
+  { href: "/#prozess", label: "Prozess" },
+  { href: "/#werdegang", label: "Werdegang" },
+  { href: "/shop", label: "Shop" },
+  { href: "/blog", label: "Journal" },
+];
+
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -26,48 +33,38 @@ export function Nav() {
       className={`fixed top-0 inset-x-0 z-40 transition-all duration-500 ${
         transparent
           ? "bg-transparent"
-          : "bg-linen/96 backdrop-blur-sm border-b border-ink/8"
+          : "bg-noir/95 backdrop-blur-sm border-b border-paper/10"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 h-16 md:h-20 flex items-center justify-between">
         {/* Logotype */}
         <Link
           href="/"
-          className={`font-heading font-bold italic text-2xl md:text-3xl transition-colors duration-500 ${
-            transparent ? "text-white" : "text-ink"
-          }`}
+          className="font-display uppercase text-2xl md:text-3xl tracking-tight text-paper leading-none"
         >
           JM
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">
-          {[
-            { href: "/#showcase", label: "Prozess" },
-            { href: "/#atelier", label: "Werdegang" },
-            { href: "/shop", label: "Shop" },
-            { href: "/blog", label: "Journal" },
-          ].map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`text-sm font-body uppercase tracking-[0.18em] transition-colors duration-300 ${
-                transparent
-                  ? "text-white/80 hover:text-white"
-                  : "text-ink/60 hover:text-sienna"
-              }`}
-            >
-              {link.label}
-            </Link>
+          {LINKS.map((link) => (
+            <motion.span key={link.href} whileHover={{ y: -1 }} whileTap={{ y: 0 }}>
+              <Link
+                href={link.href}
+                className="font-label font-medium text-[13px] uppercase tracking-[0.18em] text-paper/70 hover:text-acid transition-colors duration-200"
+              >
+                {link.label}
+              </Link>
+            </motion.span>
           ))}
           <motion.a
-            href="/#commission"
+            href="/#anfrage"
             onClick={() => track("intent")}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className="px-5 py-2 bg-sienna text-white text-xs font-body uppercase tracking-[0.12em] rounded-full hover:opacity-90 transition-opacity"
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            className="px-5 py-2 bg-acid text-noir font-mono text-[11px] font-medium uppercase tracking-[0.14em] rounded-full"
           >
-            Drop anfragen
+            Auftrag anfragen
           </motion.a>
         </nav>
 
@@ -78,19 +75,19 @@ export function Nav() {
           aria-label={open ? "Menü schließen" : "Menü öffnen"}
         >
           <span
-            className={`h-px w-full bg-current transition-transform duration-300 origin-center ${
-              transparent ? "bg-white" : "bg-ink"
-            } ${open ? "rotate-45 translate-y-[0.375rem]" : ""}`}
+            className={`h-px w-full bg-paper transition-transform duration-300 origin-center ${
+              open ? "rotate-45 translate-y-[0.375rem]" : ""
+            }`}
           />
           <span
-            className={`h-px w-full bg-current transition-opacity duration-300 ${
-              transparent ? "bg-white" : "bg-ink"
-            } ${open ? "opacity-0" : ""}`}
+            className={`h-px w-full bg-paper transition-opacity duration-300 ${
+              open ? "opacity-0" : ""
+            }`}
           />
           <span
-            className={`h-px w-full bg-current transition-transform duration-300 origin-center ${
-              transparent ? "bg-white" : "bg-ink"
-            } ${open ? "-rotate-45 -translate-y-[0.375rem]" : ""}`}
+            className={`h-px w-full bg-paper transition-transform duration-300 origin-center ${
+              open ? "-rotate-45 -translate-y-[0.375rem]" : ""
+            }`}
           />
         </button>
       </div>
@@ -103,30 +100,25 @@ export function Nav() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="md:hidden overflow-hidden bg-linen border-b border-ink/10"
+            className="md:hidden overflow-hidden bg-noir border-b border-paper/10"
           >
             <nav className="flex flex-col gap-0 px-6 py-6">
-              {[
-                { href: "/#showcase", label: "Prozess" },
-                { href: "/#atelier", label: "Werdegang" },
-                { href: "/shop", label: "Shop" },
-                { href: "/blog", label: "Journal" },
-              ].map((link) => (
+              {LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className="py-3 text-base font-body text-ink border-b border-ink/10 last:border-0 hover:text-sienna transition-colors"
+                  className="py-3 font-label text-base text-paper/80 border-b border-paper/10 last:border-0 hover:text-acid transition-colors"
                 >
                   {link.label}
                 </Link>
               ))}
               <a
-                href="/#commission"
+                href="/#anfrage"
                 onClick={() => { setOpen(false); track("intent"); }}
-                className="mt-4 py-3 text-base font-body text-sienna font-medium"
+                className="mt-4 py-3 font-mono text-sm uppercase tracking-[0.14em] text-acid"
               >
-                Drop anfragen →
+                Auftrag anfragen →
               </a>
             </nav>
           </motion.div>

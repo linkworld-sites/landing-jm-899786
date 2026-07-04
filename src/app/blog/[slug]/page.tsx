@@ -58,7 +58,7 @@ export default async function BlogPost({
       : null;
 
   return (
-    <main className="min-h-screen bg-linen pt-28 md:pt-36 pb-24">
+    <main className="min-h-screen bg-noir pt-28 md:pt-36 pb-24">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
@@ -72,36 +72,36 @@ export default async function BlogPost({
       <div className="max-w-2xl mx-auto px-6 md:px-12">
         <Link
           href="/blog"
-          className="text-xs font-body uppercase tracking-[0.18em] text-ink/45 hover:text-sienna transition-colors"
+          className="font-mono text-xs uppercase tracking-[0.18em] text-paper/45 hover:text-acid transition-colors"
         >
           ← Journal
         </Link>
 
         <div className="mt-10 mb-12">
           {post.date && (
-            <time className="text-xs font-body uppercase tracking-[0.18em] text-ink/40 block mb-4">
+            <time className="font-mono text-xs uppercase tracking-[0.18em] text-paper/40 block mb-4">
               {post.date}
             </time>
           )}
-          <h1 className="font-heading font-medium text-ink text-[clamp(2rem,5vw,3.5rem)] leading-[1.0] mb-4">
+          <h1 className="font-display uppercase text-paper text-[clamp(2rem,7vw,4rem)] leading-[0.88] mb-4">
             {post.title}
           </h1>
           {post.description && (
-            <p className="font-body text-ink/55 text-lg leading-relaxed italic">
+            <p className="font-label text-paper/55 text-lg leading-relaxed italic">
               {post.description}
             </p>
           )}
         </div>
 
         <article
-          className="post-body font-body text-ink/80 text-base"
+          className="post-body font-label text-paper/80 text-base [&_a]:text-acid [&_blockquote]:border-acid"
           dangerouslySetInnerHTML={{ __html: post.html }}
         />
 
-        <div className="mt-16 pt-8 border-t border-ink/10">
+        <div className="mt-16 pt-8 border-t border-paper/10">
           <Link
             href="/blog"
-            className="text-xs font-body uppercase tracking-[0.18em] text-ink/45 hover:text-sienna transition-colors"
+            className="font-mono text-xs uppercase tracking-[0.18em] text-paper/45 hover:text-acid transition-colors"
           >
             ← Alle Beiträge
           </Link>
