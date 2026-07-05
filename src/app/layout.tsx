@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Anton, Oswald, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { FunnelTracker } from "@/components/FunnelTracker";
 import { CookieConsent } from "@/components/CookieConsent";
@@ -7,24 +7,18 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import "./globals.css";
 
-const anton = Anton({
+const fraunces = Fraunces({
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["300", "400", "500"],
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
 
-const oswald = Oswald({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   variable: "--font-label",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
   display: "swap",
 });
 
@@ -36,8 +30,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={`${anton.variable} ${oswald.variable} ${jetbrainsMono.variable}`}>
-      <body className="bg-noir text-paper font-label antialiased">
+    <html lang="de" className={`${fraunces.variable} ${inter.variable}`}>
+      <body className="bg-paper text-ink font-label antialiased">
         {/* No-JS fallback: scroll/mount-triggered reveals render opacity:0
             inline until a script runs them; without JS that never happens,
             so force everything visible. */}

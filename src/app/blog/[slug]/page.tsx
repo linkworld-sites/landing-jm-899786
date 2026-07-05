@@ -58,7 +58,7 @@ export default async function BlogPost({
       : null;
 
   return (
-    <main className="min-h-screen bg-noir pt-28 md:pt-36 pb-24">
+    <main className="min-h-screen bg-paper pt-28 md:pt-36 pb-24">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
@@ -72,36 +72,36 @@ export default async function BlogPost({
       <div className="max-w-2xl mx-auto px-6 md:px-12">
         <Link
           href="/blog"
-          className="font-mono text-xs uppercase tracking-[0.18em] text-paper/45 hover:text-acid transition-colors"
+          className="font-label text-xs uppercase tracking-[0.18em] text-ink/45 hover:text-rust transition-colors"
         >
           ← Journal
         </Link>
 
         <div className="mt-10 mb-12">
           {post.date && (
-            <time className="font-mono text-xs uppercase tracking-[0.18em] text-paper/40 block mb-4">
+            <time className="font-label text-xs uppercase tracking-[0.18em] text-ink/40 block mb-4">
               {post.date}
             </time>
           )}
-          <h1 className="font-display uppercase text-paper text-[clamp(2rem,7vw,4rem)] leading-[0.88] mb-4">
+          <h1 className="font-display font-light text-ink text-[clamp(2rem,7vw,4rem)] leading-[1] mb-4">
             {post.title}
           </h1>
           {post.description && (
-            <p className="font-label text-paper/55 text-lg leading-relaxed italic">
+            <p className="font-label text-ink/55 text-lg leading-relaxed italic">
               {post.description}
             </p>
           )}
         </div>
 
         <article
-          className="post-body font-label text-paper/80 text-base [&_a]:text-acid [&_blockquote]:border-acid"
+          className="post-body font-label text-ink/80 text-base [&_a]:text-rust [&_blockquote]:border-rust"
           dangerouslySetInnerHTML={{ __html: post.html }}
         />
 
-        <div className="mt-16 pt-8 border-t border-paper/10">
+        <div className="mt-16 pt-8 border-t border-ink/10">
           <Link
             href="/blog"
-            className="font-mono text-xs uppercase tracking-[0.18em] text-paper/45 hover:text-acid transition-colors"
+            className="font-label text-xs uppercase tracking-[0.18em] text-ink/45 hover:text-rust transition-colors"
           >
             ← Alle Beiträge
           </Link>

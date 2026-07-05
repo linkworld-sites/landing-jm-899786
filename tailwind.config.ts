@@ -5,16 +5,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        noir: "#0A0A0A",
-        acid: "#EFFF1A",
-        navy: "#0B1F63",
-        pink: "#FF2E93",
-        paper: "#FFFFFF",
+        paper: "#F7F3EC",
+        ink: "#171310",
+        stone: "#3A322C",
+        taupe: "#8C8478",
+        rust: "#B23A2E",
       },
       fontFamily: {
-        display: ["var(--font-display)", "sans-serif"],
+        display: ["var(--font-display)", "serif"],
         label: ["var(--font-label)", "sans-serif"],
-        mono: ["var(--font-mono)", "monospace"],
+        mono: ["var(--font-label)", "sans-serif"],
       },
     },
   },

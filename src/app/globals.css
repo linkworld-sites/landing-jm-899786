@@ -58,21 +58,3 @@ html.lenis body {
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee-left, .animate-marquee-right { animation: none; }
 }
-
-/* Poster-type duotone photography — grayscale base + color-blend gradient.
-   The duo pair changes per section; never raw color photography. */
-.duotone { position: relative; isolation: isolate; }
-.duotone img, .duotone video { filter: grayscale(1) contrast(1.12); }
-.duotone::after {
-  content: ''; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: color;
-}
-.duo-navy-pink::after { background: linear-gradient(135deg, #0B1F63, #FF2E93); }
-.duo-noir-acid::after { background: linear-gradient(135deg, #0A0A0A, #EFFF1A); }
-.duo-pink-paper::after { background: linear-gradient(135deg, #FF2E93, #FFFFFF); }
-
-/* Ticker divider — a torn-edge poster strip used as a deliberate hard-cut
-   handoff between color fields, instead of a soft gradient bridge. */
-.ticker-divider {
-  overflow: hidden;
-  white-space: nowrap;
-}

@@ -33,14 +33,16 @@ export function Nav() {
       className={`fixed top-0 inset-x-0 z-40 transition-all duration-500 ${
         transparent
           ? "bg-transparent"
-          : "bg-noir/95 backdrop-blur-sm border-b border-paper/10"
+          : "bg-paper/95 backdrop-blur-sm border-b border-ink/10"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-20 h-16 md:h-20 flex items-center justify-between">
         {/* Logotype */}
         <Link
           href="/"
-          className="font-display uppercase text-2xl md:text-3xl tracking-tight text-paper leading-none"
+          className={`font-display text-2xl md:text-3xl tracking-tight leading-none transition-colors duration-500 ${
+            transparent ? "text-paper" : "text-ink"
+          }`}
         >
           JM
         </Link>
@@ -51,7 +53,9 @@ export function Nav() {
             <motion.span key={link.href} whileHover={{ y: -1 }} whileTap={{ y: 0 }}>
               <Link
                 href={link.href}
-                className="font-label font-medium text-[13px] uppercase tracking-[0.18em] text-paper/70 hover:text-acid transition-colors duration-200"
+                className={`font-label font-medium text-[13px] uppercase tracking-[0.18em] transition-colors duration-300 hover:text-rust ${
+                  transparent ? "text-paper/75" : "text-ink/70"
+                }`}
               >
                 {link.label}
               </Link>
@@ -62,7 +66,7 @@ export function Nav() {
             onClick={() => track("intent")}
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
-            className="px-5 py-2 bg-acid text-noir font-mono text-[11px] font-medium uppercase tracking-[0.14em] rounded-full"
+            className="px-5 py-2 bg-rust text-paper font-label text-[11px] font-medium uppercase tracking-[0.14em] rounded-full"
           >
             Auftrag anfragen
           </motion.a>
@@ -75,19 +79,19 @@ export function Nav() {
           aria-label={open ? "Menü schließen" : "Menü öffnen"}
         >
           <span
-            className={`h-px w-full bg-paper transition-transform duration-300 origin-center ${
-              open ? "rotate-45 translate-y-[0.375rem]" : ""
-            }`}
+            className={`h-px w-full transition-transform duration-300 origin-center ${
+              transparent ? "bg-paper" : "bg-ink"
+            } ${open ? "rotate-45 translate-y-[0.375rem]" : ""}`}
           />
           <span
-            className={`h-px w-full bg-paper transition-opacity duration-300 ${
-              open ? "opacity-0" : ""
-            }`}
+            className={`h-px w-full transition-opacity duration-300 ${
+              transparent ? "bg-paper" : "bg-ink"
+            } ${open ? "opacity-0" : ""}`}
           />
           <span
-            className={`h-px w-full bg-paper transition-transform duration-300 origin-center ${
-              open ? "-rotate-45 -translate-y-[0.375rem]" : ""
-            }`}
+            className={`h-px w-full transition-transform duration-300 origin-center ${
+              transparent ? "bg-paper" : "bg-ink"
+            } ${open ? "-rotate-45 -translate-y-[0.375rem]" : ""}`}
           />
         </button>
       </div>
@@ -100,7 +104,7 @@ export function Nav() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="md:hidden overflow-hidden bg-noir border-b border-paper/10"
+            className="md:hidden overflow-hidden bg-paper border-b border-ink/10"
           >
             <nav className="flex flex-col gap-0 px-6 py-6">
               {LINKS.map((link) => (
@@ -108,7 +112,7 @@ export function Nav() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className="py-3 font-label text-base text-paper/80 border-b border-paper/10 last:border-0 hover:text-acid transition-colors"
+                  className="py-3 font-label text-base text-ink/80 border-b border-ink/10 last:border-0 hover:text-rust transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -116,7 +120,7 @@ export function Nav() {
               <a
                 href="/#anfrage"
                 onClick={() => { setOpen(false); track("intent"); }}
-                className="mt-4 py-3 font-mono text-sm uppercase tracking-[0.14em] text-acid"
+                className="mt-4 py-3 font-label text-sm uppercase tracking-[0.14em] text-rust"
               >
                 Auftrag anfragen →
               </a>
