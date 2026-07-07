@@ -5,6 +5,7 @@ import { ShopTracker } from "@/components/ShopTracker";
 export const metadata = {
   title: "Shop — JM Unikate",
   description: "Handbemalte Jeansjacken-Unikate. Jedes Stück ein Original aus dem Wiener Atelier.",
+  alternates: { canonical: "/shop" },
 };
 
 export default async function ShopPage() {

@@ -1,0 +1,24 @@
+{
+  "organization": {
+    "name": "JM",
+    "description": "JM verwandelt persönliche Geschichten in vollständig handbemalte Denim-Unikate — signiert, datiert und ohne Wiederholung. Seit 2019 im Atelier Wien.",
+    "foundingDate": "2019",
+    "addressLocality": "Wien",
+    "addressCountry": "AT",
+    "priceRange": "€€€"
+  },
+  "faq": [
+    {
+      "q": "Wie läuft es ab, wenn ich eine individuelle Jeansjacke bemalen lassen möchte?",
+      "a": "Du reichst über das Formular deinen Namen, deine E-Mail-Adresse und die Geschichte oder Idee für dein Motiv ein. Die Anfrage wird geprüft und in die Warteliste eingereiht. Sobald dein Auftrag an der Reihe ist, wird die Jacke von Hand grundiert, über mehrere Wochen bemalt und am Ende signiert und datiert."
+    },
+    {
+      "q": "Wie lange dauert eine handbemalte Jeansjacke?",
+      "a": "Mehrere Wochen. Die Jacke wird von Hand grundiert, dann Schicht für Schicht in Acryl und Öl bemalt, bevor sie signiert und datiert wird. Es gibt keine Abkürzung, die dem fertigen Stück nicht anzusehen wäre."
+    },
+    {
+      "q": "Was kostet eine handbemalte Jeansjacke von JM?",
+      "a": "Es gibt keine Preisliste von der Stange, weil jede Jacke ein individuelles Werk ist — der Preis richtet sich nach Umfang und Aufwand deiner konkreten Geschichte und wird dir im Rahmen deiner Anfrage genannt. Was feststeht: Der Preis trägt die Stunden echter Handarbeit, nicht die Kosten eines Druckverfahrens."
+    }
+  ]
+}

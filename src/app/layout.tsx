@@ -5,7 +5,10 @@ import { FunnelTracker } from "@/components/FunnelTracker";
 import { CookieConsent } from "@/components/CookieConsent";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { getSiteMeta } from "@/lib/site-meta";
 import "./globals.css";
+
+const SITE_URL = "https://9f0e90d0.run.linkworld.ai";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -23,12 +26,31 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "JM — Handbemalte Jeansjacken-Unikate aus Wien",
   description:
     "Jede Jacke ein Unikat. Handbemalte Denim-Einzelstücke und Auftragsarbeiten aus dem Atelier Wien — von einem Künstler, für eine Person.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const { organization } = getSiteMeta();
+
+  const businessJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: organization.name,
+    description: organization.description,
+    url: SITE_URL,
+    image: `${SITE_URL}/images/hero.png`,
+    foundingDate: organization.foundingDate,
+    priceRange: organization.priceRange,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: organization.addressLocality,
+      addressCountry: organization.addressCountry,
+    },
+  };
+
   return (
     <html lang="de" className={`${fraunces.variable} ${inter.variable}`}>
       <body className="bg-paper text-ink font-label antialiased">
@@ -38,6 +60,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <noscript>
           <style>{`[style*="opacity:0"],[style*="opacity: 0"]{opacity:1 !important;transform:none !important;}`}</style>
         </noscript>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(businessJsonLd) }}
+        />
         <FunnelTracker />
         <Nav />
         <SmoothScroll>{children}</SmoothScroll>

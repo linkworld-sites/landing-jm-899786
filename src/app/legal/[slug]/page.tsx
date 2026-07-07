@@ -16,7 +16,10 @@ export async function generateMetadata({
   const { slug } = await params;
   const page = getLegalPage(slug);
   if (!page) return {};
-  return { title: `${page.title || slug} — JM` };
+  return {
+    title: `${page.title || slug} — JM`,
+    alternates: { canonical: `/legal/${slug}` },
+  };
 }
 
 export default async function LegalPage({

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MessageCircleQuestion } from "lucide-react";
 import { getPost, getPosts } from "@/lib/posts";
 
 const SITE_URL = "https://9f0e90d0.run.linkworld.ai";
@@ -97,6 +98,25 @@ export default async function BlogPost({
           className="post-body font-label text-ink/80 text-base [&_a]:text-rust [&_blockquote]:border-rust"
           dangerouslySetInnerHTML={{ __html: post.html }}
         />
+
+        {post.faq.length > 0 && (
+          <div className="mt-16 pt-8 border-t border-ink/10">
+            <span className="mb-6 flex items-center gap-2 font-label text-[11px] uppercase tracking-[0.22em] text-rust">
+              <MessageCircleQuestion className="h-3 w-3" strokeWidth={1.5} aria-hidden />
+              Häufige Fragen
+            </span>
+            <div className="space-y-6">
+              {post.faq.map((f) => (
+                <div key={f.question}>
+                  <h3 className="font-label text-base font-semibold text-ink mb-1.5">
+                    {f.question}
+                  </h3>
+                  <p className="font-label text-sm leading-relaxed text-ink/65">{f.answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-16 pt-8 border-t border-ink/10">
           <Link

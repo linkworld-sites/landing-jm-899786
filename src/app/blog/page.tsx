@@ -4,6 +4,7 @@ import { getPosts } from "@/lib/posts";
 export const metadata = {
   title: "Journal — JM",
   description: "Gedanken, Prozesse und Geschichten aus dem Atelier.",
+  alternates: { canonical: "/blog" },
 };
 
 export default function BlogIndex() {
