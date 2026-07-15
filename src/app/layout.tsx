@@ -30,6 +30,9 @@ export const metadata: Metadata = {
   title: "JM — Handbemalte Jeansjacken-Unikate aus Wien",
   description:
     "Jede Jacke ein Unikat. Handbemalte Denim-Einzelstücke und Auftragsarbeiten aus dem Atelier Wien — von einem Künstler, für eine Person.",
+  verification: {
+    google: "WlJ66mw7eszwjs5WXh-HAJ_3n22gXQA1yf23ABf0enE",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
