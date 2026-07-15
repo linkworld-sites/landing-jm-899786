@@ -2,6 +2,7 @@
 
 /**
  * MANAGED — do not edit. Non-commerce conversion:
+ *   saas     → startStep="signup", submitStep="subscription_checkout"
  *   lead_gen → startStep="form_start", submitStep="lead"
  *   service  → startStep="booking_start", submitStep="booking"
  * Fires the start step on first interaction (== storefront_walk required_steps).
